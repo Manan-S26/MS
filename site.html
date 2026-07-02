@@ -2245,6 +2245,8 @@ function closeLetterScreen() {
   gsap.to(letterScreen,{opacity:0,duration:0.5,onComplete:()=>{
     letterScreen.classList.remove('active');
     S.screen='reader';
+    showReaderUI();
+    goBackToThemes();
   }});
   gsap.to('#letter-back',{opacity:0,duration:0.3});
 }
