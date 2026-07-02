@@ -217,9 +217,32 @@ html, body { width:100%; height:100%; overflow:hidden; background:#0d0b08; font-
 .letter-body-text em { font-style:italic; font-weight:700; }
 .letter-sign { font-family:'Dancing Script',cursive; font-size:1.28rem;
   color:#3a2830; margin-top:2rem; text-align:right; line-height:1.6; }
+
+/* ── PASSWORD GATE ── */
+#pw-gate { position:fixed; inset:0; z-index:9999; background:#0d0b08;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1.8rem; }
+#pw-gate.hidden { display:none; }
+#pw-label { font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:300;
+  font-size:1.05rem; letter-spacing:0.28em; color:rgba(250,240,232,0.38); text-transform:uppercase; }
+#pw-input { background:none; border:none; border-bottom:1px solid rgba(250,240,232,0.18);
+  color:rgba(250,240,232,0.85); font-family:'Dancing Script',cursive; font-size:1.6rem;
+  text-align:center; width:200px; outline:none; padding:0.3rem 0;
+  letter-spacing:0.08em; caret-color:rgba(250,240,232,0.5); }
+#pw-input::placeholder { color:rgba(250,240,232,0.18); }
+#pw-error { font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:0.85rem; color:rgba(220,140,150,0.7); letter-spacing:0.12em;
+  opacity:0; transition:opacity 0.3s ease; }
+#pw-error.show { opacity:1; }
 </style>
 </head>
 <body>
+
+<!-- Password Gate -->
+<div id="pw-gate">
+  <p id="pw-label">enter to open</p>
+  <input id="pw-input" type="password" placeholder="·  ·  ·" autocomplete="off" autocorrect="off" spellcheck="false" />
+  <p id="pw-error">try again, love</p>
+</div>
 
 <canvas id="bg-canvas"></canvas>
 <canvas id="fx-canvas"></canvas>
@@ -452,6 +475,33 @@ html, body { width:100%; height:100%; overflow:hidden; background:#0d0b08; font-
 <!-- SCRIPTS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://unpkg.com/tone@14.7.77/build/Tone.js"></script>
+<script>
+// ── PASSWORD GATE ──
+(function(){
+  const gate  = document.getElementById('pw-gate');
+  const input = document.getElementById('pw-input');
+  const error = document.getElementById('pw-error');
+  const PW    = 'bablu';
+
+  // Already unlocked this session
+  if(sessionStorage.getItem('unlocked')==='1'){ gate.classList.add('hidden'); return; }
+
+  input.focus();
+  input.addEventListener('keydown', e => {
+    if(e.key !== 'Enter') return;
+    if(input.value.trim().toLowerCase() === PW){
+      sessionStorage.setItem('unlocked','1');
+      gsap.to(gate,{opacity:0, duration:0.8, ease:'power2.inOut',
+        onComplete:()=>gate.classList.add('hidden')});
+    } else {
+      error.classList.add('show');
+      gsap.fromTo(input,{x:-8},{x:0,duration:0.35,ease:'elastic.out(1,0.4)'});
+      input.value='';
+      setTimeout(()=>error.classList.remove('show'), 2000);
+    }
+  });
+})();
+</script>
 <script>
 // ════════════════════════════════════════════════════
 // DATA
