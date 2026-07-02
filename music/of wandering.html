@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>of wandering</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#1a1208;color:#e8e0f0;font-family:'Cormorant Garamond',serif;
+  height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.6rem;}
+h1{font-style:italic;font-weight:300;font-size:3rem;letter-spacing:0.06em;color:#c8a870;}
+.desc{font-style:italic;font-size:0.9rem;letter-spacing:0.3em;text-transform:uppercase;color:rgba(160,120,64,0.55);}
+.btn{margin-top:0.8rem;padding:0.75rem 2.6rem;border:1px solid rgba(160,120,64,0.4);
+  background:none;color:#c8a870;font-family:'Cormorant Garamond',serif;font-style:italic;
+  font-size:1.1rem;letter-spacing:0.18em;cursor:pointer;border-radius:99px;
+  transition:background 0.3s;display:flex;align-items:center;gap:0.8rem;}
+.btn:hover{background:rgba(160,120,64,0.1);}
+.btn:disabled{opacity:0.5;cursor:default;}
+.dot{width:7px;height:7px;border-radius:50%;background:#c8a870;opacity:0;transition:opacity 0.4s;}
+.dot.on{opacity:1;animation:pulse 2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:0.25}50%{opacity:1}}
+.note{font-style:italic;font-size:0.78rem;letter-spacing:0.14em;color:rgba(160,120,64,0.3);margin-top:1.2rem;}
+</style>
+</head>
+<body>
+<h1>of wandering</h1>
+<p class="desc">curious · unresolved · searching</p>
+<button class="btn" id="btn"><span class="dot" id="dot"></span><span id="lbl">▶&nbsp;&nbsp;play</span></button>
+<p class="note">D Dorian · 63 bpm · modal, exploratory, never quite settling</p>
+<script src="https://unpkg.com/tone@14.7.77/build/Tone.js"></script>
+<script>
+const MELODY = [['D4','4n'],['E4','8n'],['F4','8n'],['G4','4n'],['A4','4n'],['C5','4n'],['B4','8n'],['A4','8n'],['G4','4n'],['F4','2n'],['A4','4n'],['G4','4n'],['E4','4n'],['D4','4n'],['F4','4n'],['A4','4n'],['C5','4n'],['D5','1n']];
+const TEMPO  = 63;
+
+// Exact same sample map as the working site.html
+const SAMPLE_MAP = {
+  A0:'A0.mp3',C1:'C1.mp3','D#1':'Ds1.mp3','F#1':'Fs1.mp3',
+  A1:'A1.mp3',C2:'C2.mp3','D#2':'Ds2.mp3','F#2':'Fs2.mp3',
+  A2:'A2.mp3',C3:'C3.mp3','D#3':'Ds3.mp3','F#3':'Fs3.mp3',
+  A3:'A3.mp3',C4:'C4.mp3','D#4':'Ds4.mp3','F#4':'Fs4.mp3',
+  A4:'A4.mp3',C5:'C5.mp3','D#5':'Ds5.mp3','F#5':'Fs5.mp3',
+  A5:'A5.mp3',C6:'C6.mp3','D#6':'Ds6.mp3','F#6':'Fs6.mp3',
+  A6:'A6.mp3',C7:'C7.mp3','D#7':'Ds7.mp3','F#7':'Fs7.mp3',
+  A7:'A7.mp3',C8:'C8.mp3'
+};
+
+let piano, masterVol, timer, noteIdx=0, playing=false, ready=false, loading=false;
+const btn = document.getElementById('btn');
+const lbl = document.getElementById('lbl');
+const dot = document.getElementById('dot');
+
+function ms(dur){ return Tone.Time(dur).toSeconds() * (120/TEMPO) * 1000 * 0.86; }
+
+async function setup(){
+  loading=true; btn.disabled=true; lbl.textContent='loading…';
+  await Tone.start();
+  masterVol = new Tone.Volume(-9).toDestination();
+  const reverb = new Tone.Reverb({decay:4.5, wet:0.45}).connect(masterVol);
+  const delay  = new Tone.FeedbackDelay({delayTime:'8n', feedback:0.18, wet:0.12}).connect(reverb);
+  piano = new Tone.Sampler({
+    urls: SAMPLE_MAP,
+    baseUrl: 'https://tonejs.github.io/audio/salamander/',
+    release: 1.4,
+    onload: () => { ready=true; loading=false; btn.disabled=false; lbl.textContent='▶  play'; start(); }
+  }).connect(delay);
+}
+
+function playNext(){
+  if(!playing) return;
+  const [note,dur] = MELODY[noteIdx % MELODY.length];
+  try{ piano.triggerAttackRelease(note, dur, Tone.now(), 0.36 + Math.random()*0.14); }catch(e){}
+  noteIdx++;
+  timer = setTimeout(playNext, ms(dur));
+}
+
+function start(){
+  playing=true; noteIdx=0;
+  dot.classList.add('on'); lbl.textContent='■  stop';
+  masterVol.volume.rampTo(-9, 0.4);
+  playNext();
+}
+
+function stop(){
+  playing=false; clearTimeout(timer);
+  dot.classList.remove('on'); lbl.textContent='▶  play';
+  masterVol.volume.rampTo(-60, 0.5);
+}
+
+btn.addEventListener('click', async () => {
+  if(loading) return;
+  if(!ready){ setup(); return; }
+  playing ? stop() : start();
+});
+</script>
+</body>
+</html>
