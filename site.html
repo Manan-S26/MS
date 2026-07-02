@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>for bubs · four years of you</title>
+<title>You</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤍</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400;1,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Dancing+Script:wght@500;600&display=swap" rel="stylesheet">
@@ -2225,11 +2226,13 @@ function openLetterScreen() {
   gsap.set(stampCracks,{opacity:0});
   stampHint.style.opacity='1';
   gsap.set(letterPaperWrap,{opacity:0});
+  gsap.set('#letter-paper',{y:0, clipPath:'none', clearProps:'clipPath'});
   letterPaperWrap.classList.remove('visible');
   const envWrapReset = document.getElementById('letter-envelope-wrap');
   envWrapReset.style.position = '';
-  envWrapReset.style.zIndex = '';
-  gsap.set(envWrapReset,{opacity:1,y:0});
+  envWrapReset.style.zIndex   = '';
+  gsap.set(envWrapReset,{opacity:1, y:0});
+  gsap.set('#env-flap',{scaleY:1, svgOrigin:'160 60', opacity:1});
 
   letterScreen.classList.add('active');
   gsap.to(letterScreen,{opacity:1,duration:0.8,ease:'power2.inOut'});
@@ -2261,27 +2264,61 @@ heartStamp.addEventListener('click', () => {
     gsap.fromTo(heartStamp,{scale:1},{scale:1.16,duration:0.1,yoyo:true,repeat:1,ease:'power2.out'});
     stampHint.textContent = 'one more…';
   } else if(stampClicks >= 3) {
-    // Open the letter — letter rises out of the envelope
-    stampHint.style.opacity='0';
-
-    // 1. Stamp shatters
-    gsap.to(heartStamp,{scale:1.4,opacity:0,duration:0.3,ease:'power2.in'});
-
-    // 2. Immediately make letter paper visible but starting deep behind the envelope
-    //    Envelope sits on top (z-index) while letter rises from within it
+    stampHint.style.opacity = '0';
     const envWrap = document.getElementById('letter-envelope-wrap');
-    envWrap.style.position = 'relative';
-    envWrap.style.zIndex = '10';
+
+    // ── Phase 1: Stamp shatters (0 – 0.35s) ──
+    gsap.to(heartStamp, {scale:1.4, opacity:0, duration:0.35, ease:'power2.in'});
+
+    // ── Phase 2: Envelope flap swings open (0.2 – 0.75s) ──
+    // Flip the triangle flap around its base line (y=60 in SVG coords)
+    gsap.to('#env-flap', {
+      scaleY: -1,
+      svgOrigin: '160 60',
+      opacity: 0.08,
+      duration: 0.55,
+      delay: 0.2,
+      ease: 'power2.inOut'
+    });
+
+    // ── Phase 3: Letter rises from inside envelope (0.55 – 2.1s) ──
+    // Key trick: clip-path and y animate in the same tween so they're perfectly locked —
+    // the bottom edge of the visible letter stays at the envelope opening as it rises.
     letterPaperWrap.classList.add('visible');
-    gsap.set(letterPaperWrap,{opacity:1});
-    gsap.set('#letter-paper',{y:160, opacity:1});
+    gsap.set(letterPaperWrap, {opacity: 1});
+    gsap.set('#letter-paper', {
+      y: 300,
+      clipPath: 'inset(0px 0px 100% 0px round 3px)',
+      clearProps: 'none'
+    });
 
-    // 3. Letter rises upward, emerging from the envelope
-    gsap.to('#letter-paper',{y:0, duration:1.1, ease:'power2.out', delay:0.15});
+    // Envelope stays on top while letter rises from behind it
+    envWrap.style.position = 'relative';
+    envWrap.style.zIndex   = '10';
 
-    // 4. Envelope fades away once the letter is halfway out
-    gsap.to(envWrap,{opacity:0, duration:0.5, delay:0.55, ease:'power2.in',
-      onComplete:()=>{ envWrap.style.zIndex=''; envWrap.style.position=''; }
+    gsap.to('#letter-paper', {
+      y: 0,
+      clipPath: 'inset(0px 0px 0% 0px round 3px)',
+      duration: 1.65,
+      delay: 0.55,
+      ease: 'power2.out',
+      onComplete: () => {
+        // Clear clip-path so letter renders cleanly for reading
+        gsap.set('#letter-paper', {clipPath: 'none'});
+      }
+    });
+
+    // ── Phase 4: Envelope drifts down and fades (1.15 – 1.85s) ──
+    gsap.to(envWrap, {
+      y: 55,
+      opacity: 0,
+      duration: 0.75,
+      delay: 1.15,
+      ease: 'power2.in',
+      onComplete: () => {
+        envWrap.style.position = '';
+        envWrap.style.zIndex   = '';
+      }
     });
   }
 });
