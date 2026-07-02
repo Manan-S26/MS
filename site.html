@@ -1,0 +1,2270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>for bubs · four years of you</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400;1,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Dancing+Script:wght@500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root { --ease-out: cubic-bezier(0.22, 1, 0.36, 1); --cream: #faf7f0; }
+
+html, body { width:100%; height:100%; overflow:hidden; background:#0d0b08; font-family:'EB Garamond',serif; color:var(--cream); -webkit-font-smoothing:antialiased; }
+
+/* ── CANVAS ── */
+#bg-canvas { position:fixed; inset:0; z-index:0; pointer-events:none; }
+#fx-canvas { position:fixed; inset:0; z-index:150; pointer-events:none; opacity:0; }
+
+/* ── VIGNETTE ── */
+.vignette { position:fixed; inset:0; z-index:5; pointer-events:none;
+  background: radial-gradient(ellipse at 50% 50%, transparent 45%, rgba(0,0,0,0.55) 100%); }
+
+/* ── SCREENS ── */
+.screen { position:fixed; inset:0; z-index:10; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; pointer-events:none; }
+.screen.active { pointer-events:all; }
+
+/* ── INTRO ── */
+#screen-intro { z-index:300; background:#0a0806; }
+
+.intro-flower { width:110px; height:110px; margin-bottom:2.2rem; opacity:0; }
+.intro-flower svg { width:100%; height:100%; overflow:visible; }
+.flower-path { fill:none; stroke-linecap:round; stroke-linejoin:round;
+  stroke-dasharray:400; stroke-dashoffset:400; }
+
+.intro-for { font-family:'Dancing Script',cursive; font-size:clamp(2.8rem,8vw,5rem);
+  color:#faf0e8; opacity:0; letter-spacing:0.02em; text-align:center; }
+.intro-sub { font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:clamp(0.9rem,2.5vw,1.15rem); color:#c9a882; opacity:0;
+  letter-spacing:0.08em; text-align:center; margin-top:0.55rem; padding:0 1rem; }
+.intro-tap { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:0.82rem;
+  color:rgba(250,240,232,0.38); letter-spacing:0.22em; text-transform:uppercase;
+  margin-top:3.2rem; opacity:0; }
+.intro-tap.visible { animation:pulse-tap 2.5s ease-in-out infinite; }
+
+@keyframes pulse-tap { 0%,100%{opacity:0.32;} 50%{opacity:0.72;} }
+
+/* ── THEME SELECTOR ── */
+#screen-themes { z-index:200; background:transparent; padding:2rem; opacity:0; }
+
+.themes-header { text-align:center; margin-bottom:2.2rem; opacity:0; transform:translateY(20px); }
+.themes-header h2 { font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:300;
+  font-size:clamp(0.9rem,2.5vw,1.25rem); color:rgba(250,240,232,0.45);
+  letter-spacing:0.28em; text-transform:uppercase; }
+
+.theme-cards { display:flex; flex-wrap:wrap; justify-content:center; gap:1.1rem;
+  max-width:820px; width:100%; }
+
+@media (max-width:600px) {
+  .theme-cards { gap:0.75rem; }
+  .theme-card { flex:0 0 calc(50% - 0.6rem); }
+}
+
+.theme-card { position:relative; border-radius:14px; padding:1.6rem 1.2rem 1.4rem;
+  cursor:pointer; opacity:0; transform:translateY(28px) scale(0.96); overflow:hidden;
+  border:1px solid rgba(255,255,255,0.06); background:rgba(255,255,255,0.03);
+  backdrop-filter:blur(6px); text-align:center; min-height:195px;
+  flex:0 0 calc(33.333% - 0.8rem);
+  display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
+  transition:border-color 0.4s ease, transform 0.4s var(--ease-out), box-shadow 0.4s ease; }
+
+.theme-card::before { content:''; position:absolute; inset:0; opacity:0;
+  transition:opacity 0.4s ease; border-radius:inherit; }
+.theme-card:hover { transform:translateY(-5px) scale(1.02);
+  border-color:rgba(255,255,255,0.14); box-shadow:0 18px 55px rgba(0,0,0,0.45); }
+.theme-card:hover::before { opacity:1; }
+
+.theme-card[data-id="falling_apart"] { --tc:122,143,168; }
+.theme-card[data-id="growing"]        { --tc:109,138,101; }
+.theme-card[data-id="gentle_things"]  { --tc:184,120,120; }
+.theme-card[data-id="wandering"]      { --tc:160,120,64;  }
+.theme-card[data-id="love"]           { --tc:136,120,168; }
+
+.theme-card::before { background:radial-gradient(ellipse at center, rgba(var(--tc),0.18) 0%, transparent 70%); }
+
+.theme-illustration { width:68px; height:68px; margin-bottom:0.9rem; position:relative; z-index:1; }
+.theme-illustration svg { width:100%; height:100%; overflow:visible;
+  transition:transform 0.4s var(--ease-out); }
+.theme-card:hover .theme-illustration svg { transform:scale(1.1) translateY(-3px); }
+
+.theme-title { font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:400;
+  font-size:clamp(0.95rem,2.5vw,1.15rem); color:var(--cream); position:relative; z-index:1; line-height:1.3; }
+.theme-count { font-family:'Cormorant Garamond',serif; font-size:0.75rem;
+  color:rgba(250,240,232,0.38); margin-top:0.25rem; letter-spacing:0.12em; position:relative; z-index:1; }
+
+/* ── POEM READER ── */
+#screen-reader { z-index:100; opacity:0; padding:0; justify-content:flex-start; }
+
+.reader-content { position:relative; width:100%; max-width:660px; padding:0 2.5rem;
+  margin:0 auto; height:100vh; display:block;
+  overflow-y:auto; scrollbar-width:none; }
+.reader-content::-webkit-scrollbar { display:none; }
+
+/* Consistent top anchor — always starts from same spot */
+.poem-inner { padding-top:22vh; padding-bottom:12vh; min-height:100%; }
+
+.reader-back { position:fixed; top:1.4rem; left:1.6rem; z-index:250; background:none;
+  border:none; cursor:pointer; color:rgba(250,240,232,0.38); font-family:'Cormorant Garamond',serif;
+  font-style:italic; font-size:0.82rem; letter-spacing:0.18em; text-transform:uppercase;
+  transition:color 0.3s ease; padding:0.4rem 0; display:flex; align-items:center; gap:0.45rem; opacity:0; }
+.reader-back:hover { color:rgba(250,240,232,0.82); }
+.reader-back svg { width:13px; height:13px; flex-shrink:0; }
+
+.poem-theme-label { position:fixed; top:1.4rem; right:calc(1.6rem + 34px + 0.6rem); z-index:250;
+  height:34px; display:flex; align-items:center;
+  font-family:'Cormorant Garamond',serif; font-style:italic; font-size:0.76rem;
+  letter-spacing:0.22em; text-transform:uppercase; color:var(--theme-accent,rgba(250,240,232,0.42));
+  opacity:0; pointer-events:none; }
+.poem-title { font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:400;
+  font-size:clamp(1.35rem,3.8vw,2.1rem); line-height:1.22; color:var(--cream);
+  margin-bottom:1.8rem; opacity:0; }
+.poem-body { font-family:'EB Garamond',serif; font-size:clamp(1rem,2.2vw,1.12rem);
+  line-height:1.95; color:rgba(250,240,232,0.86); white-space:pre-line; opacity:0; }
+
+/* ── PROGRESS DOTS ── */
+.progress-dots { position:fixed; bottom:1.2rem; left:50%; transform:translateX(-50%);
+  display:flex; gap:0.48rem; z-index:250; opacity:0; }
+.dot { width:5px; height:5px; border-radius:50%; background:rgba(250,240,232,0.18);
+  transition:all 0.4s var(--ease-out); cursor:pointer; }
+.dot.active { background:var(--theme-accent,rgba(250,240,232,0.85)); transform:scale(1.5); }
+
+/* ── NAV ARROWS ── */
+.nav-arrow { position:fixed; top:50%; transform:translateY(-50%); z-index:250;
+  background:none; border:none; cursor:pointer; color:rgba(250,240,232,0.18);
+  width:46px; height:46px; display:flex; align-items:center; justify-content:center;
+  transition:color 0.3s ease; opacity:0; }
+.nav-arrow:hover { color:rgba(250,240,232,0.62); }
+.nav-arrow.prev { left:1rem; }
+.nav-arrow.next { right:1rem; width:58px; height:58px; }
+.nav-arrow svg { width:20px; height:20px; }
+.nav-arrow.next svg { width:26px; height:26px; }
+
+/* ── SOUND TOGGLE ── */
+#sound-toggle { position:fixed; top:1.4rem; right:1.6rem; z-index:400; background:none;
+  border:none; cursor:pointer; color:rgba(250,240,232,0.28); width:34px; height:34px;
+  display:flex; align-items:center; justify-content:center; transition:color 0.3s ease; opacity:0; }
+#sound-toggle:hover { color:rgba(250,240,232,0.68); }
+#sound-toggle svg { width:17px; height:17px; }
+
+/* ── LOADING INDICATOR ── */
+#music-loading { position:fixed; bottom:1.2rem; right:1.6rem; z-index:400;
+  font-family:'Cormorant Garamond',serif; font-style:italic; font-size:0.72rem;
+  color:rgba(250,240,232,0.3); letter-spacing:0.1em; opacity:0; transition:opacity 0.5s ease; }
+
+/* ── FOOTER ── */
+#site-footer { position:fixed; bottom:3rem; left:0; right:0; text-align:center; padding:0.4rem;
+  font-family:'Cormorant Garamond',serif; font-style:italic; font-size:0.78rem;
+  color:rgba(196,184,212,0.32); letter-spacing:0.18em; z-index:50;
+  pointer-events:none; opacity:0; transition:opacity 1.2s ease; }
+
+/* ── HEART TRANSITION OVERLAY ── */
+#heart-overlay { position:fixed; inset:0; z-index:160; pointer-events:none;
+  opacity:0; background:radial-gradient(ellipse at center, rgba(220,100,130,0.18) 0%, transparent 70%); }
+
+/* ── SECRET LETTER SCREEN ── */
+#screen-letter { position:fixed; inset:0; z-index:300; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; opacity:0; pointer-events:none;
+  background:linear-gradient(160deg,#130818 0%,#1a0d22 60%,#200e1a 100%); }
+#screen-letter.active { pointer-events:all; }
+
+#letter-back { position:fixed; top:1.4rem; left:1.6rem; z-index:350; background:none;
+  border:none; cursor:pointer; color:rgba(250,240,232,0.3); font-family:'Cormorant Garamond',serif;
+  font-style:italic; font-size:0.82rem; letter-spacing:0.18em; text-transform:uppercase;
+  transition:color 0.3s ease; display:flex; align-items:center; gap:0.4rem; opacity:0; }
+#letter-back:hover { color:rgba(250,240,232,0.7); }
+#letter-back svg { width:13px; height:13px; }
+
+#letter-envelope-wrap { display:flex; flex-direction:column; align-items:center; gap:0; }
+#letter-env { position:relative; width:320px; display:flex; flex-direction:column; align-items:center; }
+#env-svg { width:320px; filter:drop-shadow(0 4px 24px rgba(160,90,200,0.18)); }
+
+#heart-stamp { position:absolute; bottom:32px; left:50%; transform:translateX(-50%);
+  width:64px; height:64px; cursor:pointer;
+  filter:drop-shadow(0 0 8px rgba(180,70,100,0.55));
+  transition:filter 0.3s ease, transform 0.2s ease; }
+#heart-stamp:hover { transform:translateX(-50%) scale(1.08); }
+#heart-stamp svg { width:100%; height:100%; }
+#heart-stamp.glow1 { filter:drop-shadow(0 0 14px rgba(210,90,130,0.75)); }
+#heart-stamp.glow2 { filter:drop-shadow(0 0 22px rgba(240,120,155,0.9)) drop-shadow(0 0 8px rgba(255,180,200,0.6)); }
+
+#stamp-hint { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:0.76rem;
+  letter-spacing:0.22em; color:rgba(200,170,220,0.35); text-transform:uppercase;
+  margin-top:0.8rem; transition:opacity 0.5s ease; }
+
+/* ── THE LETTER PAPER ── */
+#letter-paper-wrap { position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+  pointer-events:none; opacity:0; }
+#letter-paper-wrap.visible { pointer-events:all; }
+#letter-paper { background:rgba(252,248,244,0.96); border-radius:3px; width:min(480px,88vw);
+  max-height:78vh; overflow-y:auto; scrollbar-width:none;
+  padding:3.5rem 3.2rem 3rem; position:relative;
+  box-shadow:0 12px 60px rgba(0,0,0,0.55), 0 2px 12px rgba(160,90,200,0.18); }
+#letter-paper::-webkit-scrollbar { display:none; }
+
+/* Ruled lines behind text */
+#letter-lines { position:absolute; inset:0; pointer-events:none; overflow:hidden; border-radius:3px; }
+#letter-lines::before {
+  content:''; position:absolute; left:0; right:0; top:5.5rem; bottom:0;
+  background:repeating-linear-gradient(transparent, transparent 31px, rgba(160,140,120,0.08) 32px);
+}
+
+.letter-salutation { font-family:'Dancing Script',cursive; font-size:1.55rem;
+  color:#3a2830; margin-bottom:1.8rem; line-height:1.4; }
+.letter-body-text { font-family:'Dancing Script',cursive; font-size:1.12rem; line-height:1.9;
+  color:#4a3540; margin-bottom:1.4rem; }
+.letter-body-text em { font-style:italic; font-weight:700; }
+.letter-sign { font-family:'Dancing Script',cursive; font-size:1.28rem;
+  color:#3a2830; margin-top:2rem; text-align:right; line-height:1.6; }
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<canvas id="fx-canvas"></canvas>
+<div class="vignette"></div>
+<div id="heart-overlay"></div>
+
+<!-- SOUND TOGGLE -->
+<button id="sound-toggle" title="Toggle music">
+  <svg id="icon-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+    <path d="M9 9H5a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h4l5 4V5L9 9z"/>
+    <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+  </svg>
+  <svg id="icon-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="display:none">
+    <path d="M9 9H5a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h4l5 4V5L9 9z"/>
+    <line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>
+  </svg>
+</button>
+<div id="music-loading">loading piano…</div>
+
+<!-- INTRO -->
+<div id="screen-intro" class="screen active">
+  <div class="intro-flower" id="intro-flower">
+    <svg viewBox="-60 -60 120 120">
+      <path class="flower-path" d="M0,50 C0,30 -8,10 0,-10" stroke="#6d8a65" stroke-width="1.5"/>
+      <path class="flower-path" d="M-2,20 C-18,14 -22,2 -12,-2 C-6,4 -2,12 -2,20" stroke="#6d8a65" fill="rgba(109,138,101,0.12)"/>
+      <path class="flower-path" d="M0,-10 C6,-24 18,-30 14,-18 C10,-8 4,-6 0,-10" stroke="#d4a5a5" fill="rgba(212,165,165,0.12)"/>
+      <path class="flower-path" d="M0,-10 C12,-20 22,-14 16,-4 C10,2 4,0 0,-10" stroke="#d4a5a5" fill="rgba(212,165,165,0.12)"/>
+      <path class="flower-path" d="M0,-10 C10,-18 14,-4 4,2 C-2,2 -4,-4 0,-10" stroke="#d4a5a5" fill="rgba(212,165,165,0.12)"/>
+      <path class="flower-path" d="M0,-10 C-8,-22 -20,-18 -16,-6 C-12,2 -6,2 0,-10" stroke="#d4a5a5" fill="rgba(212,165,165,0.12)"/>
+      <path class="flower-path" d="M0,-10 C-14,-20 -20,-6 -12,2 C-6,6 -2,2 0,-10" stroke="#d4a5a5" fill="rgba(212,165,165,0.12)"/>
+      <circle class="flower-path" cx="0" cy="-10" r="4" stroke="#c9956c" fill="rgba(201,149,108,0.3)" stroke-width="1"/>
+    </svg>
+  </div>
+  <div class="intro-for" id="intro-for">for bubs</div>
+  <div class="intro-sub" id="intro-sub">four years of you &amp; your beautiful poetry</div>
+  <div class="intro-tap" id="intro-tap">tap anywhere to begin</div>
+</div>
+
+<!-- THEME SELECTOR -->
+<div id="screen-themes" class="screen">
+  <div class="themes-header" id="themes-header"><h2>she wrote about</h2></div>
+  <div class="theme-cards" id="theme-cards">
+
+    <div class="theme-card" data-id="falling_apart" tabindex="0">
+      <div class="theme-illustration">
+        <svg viewBox="0 0 60 70" fill="none">
+          <!-- Cloud left -->
+          <path d="M8 38 Q6 32 11 30 Q11 24 17 24 Q20 20 25 22 Q29 18 34 21 Q39 19 41 24 Q47 24 47 30 Q52 32 50 38 Z"
+                stroke="#7a8fa8" stroke-width="1.1" fill="rgba(122,143,168,0.08)" stroke-linejoin="round"/>
+          <!-- Rain drops -->
+          <line x1="18" y1="42" x2="16" y2="50" stroke="#7a8fa8" stroke-width="0.9" stroke-linecap="round"/>
+          <line x1="25" y1="43" x2="23" y2="52" stroke="#7a8fa8" stroke-width="0.9" stroke-linecap="round"/>
+          <line x1="32" y1="42" x2="30" y2="51" stroke="#7a8fa8" stroke-width="0.9" stroke-linecap="round"/>
+          <line x1="39" y1="43" x2="37" y2="52" stroke="#7a8fa8" stroke-width="0.9" stroke-linecap="round"/>
+          <!-- Lightning bolt -->
+          <path d="M32 28 L27 38 L31 38 L26 50 L35 36 L30 36 Z"
+                fill="rgba(180,200,225,0.35)" stroke="#9ab0c8" stroke-width="0.7" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="theme-title">of falling apart</div>
+      <div class="theme-count">8 poems</div>
+    </div>
+
+    <div class="theme-card" data-id="growing" tabindex="0">
+      <div class="theme-illustration">
+        <svg viewBox="0 0 60 70" fill="none">
+          <path d="M30 65 L30 30" stroke="#6d8a65" stroke-width="1.4" stroke-linecap="round"/>
+          <path d="M30 50 Q18 44 14 34 Q20 28 28 38 Q30 42 30 46" stroke="#6d8a65" stroke-width="1" fill="rgba(109,138,101,0.1)"/>
+          <path d="M30 42 Q42 36 46 26 Q40 20 32 30 Q30 34 30 38" stroke="#6d8a65" stroke-width="1" fill="rgba(109,138,101,0.08)"/>
+          <path d="M24 22 Q26 14 30 10 Q34 14 36 22 Q34 28 30 28 Q26 28 24 22Z" stroke="#a8b5a2" stroke-width="1.2" fill="rgba(168,181,162,0.12)"/>
+          <circle cx="30" cy="19" r="2" fill="rgba(168,181,162,0.28)" stroke="#a8b5a2" stroke-width="0.8"/>
+        </svg>
+      </div>
+      <div class="theme-title">of growing</div>
+      <div class="theme-count">6 poems</div>
+    </div>
+
+    <div class="theme-card" data-id="gentle_things" tabindex="0">
+      <div class="theme-illustration">
+        <svg viewBox="0 0 60 70" fill="none">
+          <path d="M30 58 L30 35" stroke="#b87878" stroke-width="1.4" stroke-linecap="round"/>
+          <path d="M30 28 C24 24 20 16 26 14 C29 13 30 18 30 22" stroke="#d4a5a5" stroke-width="1.1" fill="rgba(212,165,165,0.14)"/>
+          <path d="M30 28 C36 24 40 16 34 14 C31 13 30 18 30 22" stroke="#d4a5a5" stroke-width="1.1" fill="rgba(212,165,165,0.14)"/>
+          <path d="M30 28 C22 28 16 22 18 16 C20 11 26 14 28 18" stroke="#d4a5a5" stroke-width="1.1" fill="rgba(212,165,165,0.1)"/>
+          <path d="M30 28 C38 28 44 22 42 16 C40 11 34 14 32 18" stroke="#d4a5a5" stroke-width="1.1" fill="rgba(212,165,165,0.1)"/>
+          <circle cx="30" cy="24" r="3.5" fill="rgba(212,165,165,0.2)" stroke="#d4a5a5" stroke-width="0.8"/>
+          <path d="M30 42 Q20 38 18 32 Q24 28 30 36" stroke="#b87878" stroke-width="0.8" fill="rgba(184,120,120,0.07)"/>
+        </svg>
+      </div>
+      <div class="theme-title">of gentle things</div>
+      <div class="theme-count">5 poems</div>
+    </div>
+
+    <div class="theme-card" data-id="wandering" tabindex="0">
+      <div class="theme-illustration">
+        <svg viewBox="0 0 60 70" fill="none">
+          <path d="M30 65 Q28 55 30 40" stroke="#a07840" stroke-width="1.3" stroke-linecap="round"/>
+          <circle cx="30" cy="40" r="2.5" fill="rgba(160,120,64,0.2)" stroke="#a07840" stroke-width="0.8"/>
+          <path d="M30 37 L28 28 M28 28 C26 26 24 24 22 23" stroke="#c9956c" stroke-width="0.7" stroke-linecap="round"/>
+          <path d="M30 37 L32 26 M32 26 C34 24 36 22 38 20" stroke="#c9956c" stroke-width="0.7" stroke-linecap="round"/>
+          <path d="M30 37 L24 30 M24 30 C22 28 18 26 16 25" stroke="#c9956c" stroke-width="0.7" stroke-linecap="round"/>
+          <path d="M30 37 L36 32 M36 32 C38 30 42 30 44 30" stroke="#c9956c" stroke-width="0.7" stroke-linecap="round"/>
+          <path d="M30 37 L30 25 M30 25 C30 22 30 18 30 15" stroke="#c9956c" stroke-width="0.7" stroke-linecap="round"/>
+          <circle cx="21" cy="23" r="1.5" fill="rgba(201,149,108,0.4)"/>
+          <circle cx="39" cy="19" r="1.5" fill="rgba(201,149,108,0.4)"/>
+          <circle cx="15" cy="24" r="1.5" fill="rgba(201,149,108,0.3)"/>
+          <circle cx="45" cy="30" r="1.5" fill="rgba(201,149,108,0.3)"/>
+          <circle cx="30" cy="13" r="1.5" fill="rgba(201,149,108,0.4)"/>
+        </svg>
+      </div>
+      <div class="theme-title">of wandering</div>
+      <div class="theme-count">4 poems</div>
+    </div>
+
+    <div class="theme-card" data-id="love" tabindex="0">
+      <div class="theme-illustration">
+        <svg viewBox="0 0 60 70" fill="none">
+          <path d="M18 65 Q20 50 24 38 Q28 28 30 22" stroke="#8878a8" stroke-width="1.3" stroke-linecap="round"/>
+          <path d="M42 65 Q40 50 36 38 Q32 28 30 22" stroke="#8878a8" stroke-width="1.3" stroke-linecap="round"/>
+          <!-- Heart -->
+          <path d="M30 20 C30 20 23 14 23 10 C23 7 25.5 5 28 6.5 C29 7 30 8 30 8 C30 8 31 7 32 6.5 C34.5 5 37 7 37 10 C37 14 30 20 30 20Z" stroke="#c4b8d4" stroke-width="1" fill="rgba(196,184,212,0.2)"/>
+          <circle cx="14" cy="20" r="1" fill="#c4b8d4" opacity="0.45"/>
+          <circle cx="46" cy="16" r="0.8" fill="#c4b8d4" opacity="0.38"/>
+          <circle cx="20" cy="10" r="0.6" fill="#c4b8d4" opacity="0.55"/>
+        </svg>
+      </div>
+      <div class="theme-title">of love</div>
+      <div class="theme-count">5 poems</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- POEM READER -->
+<div id="screen-reader" class="screen">
+  <button class="reader-back" id="reader-back">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+      <path d="M19 12H5M5 12l7-7M5 12l7 7"/>
+    </svg>
+    all themes
+  </button>
+
+  <div class="poem-theme-label" id="poem-theme-label"></div>
+
+  <div class="reader-content" id="reader-content">
+    <div class="poem-inner" id="poem-inner">
+      <div class="poem-title" id="poem-title"></div>
+      <div class="poem-body" id="poem-body"></div>
+    </div>
+  </div>
+
+  <div class="progress-dots" id="progress-dots"></div>
+  <button class="nav-arrow prev" id="nav-prev">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M15 19l-7-7 7-7"/></svg>
+  </button>
+  <button class="nav-arrow next" id="nav-next">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>
+  </button>
+</div>
+
+<div id="site-footer">made with love by manan</div>
+
+<!-- SECRET LETTER SCREEN -->
+<div id="screen-letter">
+  <button id="letter-back">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M15 19l-7-7 7-7"/></svg>
+    back
+  </button>
+
+  <!-- Closed envelope + stamp -->
+  <div id="letter-envelope-wrap">
+    <div id="letter-env">
+      <!-- Envelope body -->
+      <svg id="env-svg" viewBox="0 0 320 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Body -->
+        <rect x="4" y="60" width="312" height="156" rx="8"
+              fill="rgba(240,230,248,0.07)" stroke="rgba(200,175,225,0.28)" stroke-width="1.5"/>
+        <!-- Flap fold lines -->
+        <path d="M4 60 L160 148 L316 60" stroke="rgba(200,175,225,0.22)" stroke-width="1.2" fill="none"/>
+        <path d="M4 60 L4 216 L316 216 L316 60" stroke="rgba(200,175,225,0.16)" stroke-width="1" fill="none"/>
+        <!-- Bottom triangle folds -->
+        <path d="M4 216 L160 142 L316 216" stroke="rgba(200,175,225,0.16)" stroke-width="1" fill="none"/>
+        <!-- Left fold -->
+        <path d="M4 60 L110 138" stroke="rgba(200,175,225,0.13)" stroke-width="1" fill="none"/>
+        <!-- Right fold -->
+        <path d="M316 60 L210 138" stroke="rgba(200,175,225,0.13)" stroke-width="1" fill="none"/>
+        <!-- Envelope top flap (open state hidden initially) -->
+        <path id="env-flap" d="M4 60 L160 4 L316 60 Z"
+              fill="rgba(220,200,240,0.09)" stroke="rgba(200,175,225,0.28)" stroke-width="1.5"/>
+      </svg>
+
+      <!-- Heart wax stamp -->
+      <div id="heart-stamp">
+        <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="30" cy="30" r="28" fill="rgba(160,60,90,0.82)" stroke="rgba(200,120,150,0.4)" stroke-width="1.5"/>
+          <path id="stamp-heart"
+            d="M30 42 C20 35 10 28 10 20 C10 14 15 10 20 10 C24 10 27.5 13 30 16 C32.5 13 36 10 40 10 C45 10 50 14 50 20 C50 28 40 35 30 42 Z"
+            fill="rgba(240,180,200,0.92)"/>
+          <!-- crack lines (hidden until click 2) -->
+          <g id="stamp-cracks" opacity="0">
+            <line x1="30" y1="10" x2="28" y2="28" stroke="rgba(255,220,230,0.7)" stroke-width="0.8"/>
+            <line x1="30" y1="28" x2="36" y2="42" stroke="rgba(255,220,230,0.7)" stroke-width="0.8"/>
+            <line x1="20" y1="18" x2="32" y2="26" stroke="rgba(255,220,230,0.5)" stroke-width="0.6"/>
+          </g>
+        </svg>
+      </div>
+      <div id="stamp-hint">tap the seal to open</div>
+    </div>
+  </div>
+
+  <!-- The actual letter (hidden until stamp clicked 3×) -->
+  <div id="letter-paper-wrap">
+    <div id="letter-paper">
+      <div id="letter-lines"></div>
+      <div id="letter-content">
+        <p class="letter-salutation">My dear,</p>
+
+        <p class="letter-body-text">I hope you are thriving, every single time you read this — always. You should know that you are the most important person in my life and I love you so very much. I wish the World were perfect and you were reading this in front of me, but the World is just not ready yet I guess. I trust the Universe to correct it soon so you can be here with me and we can both make lots of money and achieve more than we have ever desired, all while coming back home to each other.</p>
+
+        <p class="letter-body-text">I told 6 people today that it's our anniversary, they didn't ask, I just felt like talking about you, as I usually do. It's funny that I talk about you when you are not there but like to stay quiet on our calls, I guess that's because I feel calm with you and love being in the moment, or maybe it's just because I like the slivers of silence amidst your yapping. All 6 people, including my cab driver, were happy for me and then all 6 people, including my cab driver, were sad for me, sad that we aren't together today. But I guess the World isn't ready yet. I trust the Universe to correct it soon so we can be together and achieve everything we never even dreamed of, while keeping people from being sad for us.</p>
+
+        <p class="letter-body-text"><em>You</em> make me the happiest I have ever been and I can't wait to spend all of my life with you. I do wish things were easier for us and we could just be together, that sounds easy enough… but I guess the World isn't ready yet. But I hear myself saying that and I realize the flaw. You are my World. The only one that matters, so I guess I just have to wait for the rest of the world to catch up to <em>my</em> World. To catch up to my love for you.</p>
+
+        <p class="letter-sign">With love,<br>Bazz <span style="font-size:0.85em; opacity:0.7;">(short for Bablu Bindass)</span></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCRIPTS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://unpkg.com/tone@14.7.77/build/Tone.js"></script>
+<script>
+// ════════════════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════════════════
+const THEMES = [
+  {
+    id:'falling_apart', title:'of falling apart', accent:'#7a8fa8',
+    bg1:'#0f1520', bg2:'#1a2030', particleMode:'rain',
+    melody:[['C3','2n'],['G2','2n.'],['Eb3','2n'],['Bb2','1n'],['Ab3','2n'],['C3','1n'],
+            ['G3','2n'],['F3','2n'],['Eb3','1n'],['D3','2n'],['C3','1n']],
+    tempo:44,
+    poems:[
+      {title:'I will always think of you',body:`there's an empty room in my house
+that i refuse to call with any other name
+than yours
+it's been 7 years since the day i last heard you
+call out to me
+october was just october this year
+and not the biggest bluest saddest thing to
+ever have happened to me
+i did think of you
+but with a little less ache than i used to
+which aches even more
+because i want to hold on to you as tightly as i
+can for as long as i can
+and it hurts to let you go
+to not think of you as much as i used to
+to not miss you every time i leave home
+every time i come back to it
+it hurts to watch time heal my ache of your
+absence
+i still wish you were here
+every day
+i will always continue to wish that
+till the end of my days`},
+      {title:'No one knows that you\'re not here anymore',body:`we're sitting in the balcony you peel oranges for me and I look at you like you love me and I know that you do so I close my eyes// we're in your bed and you're rereading me a story about a grandma who's eagerly waiting for a letter from her grandson and a boy who fights all rain and storm to deliver that letter to her and I wake up to you watching the sunrise and reading stories to me about gods and goddesses and I don't believe in them as much I just believe in you and that's enough// it's like a poem only the two of us knew and now you're not here anymore and every single year I sit and try to recall that poem from memory but I'm losing the metaphors I'm losing your face and your voice and how you laughed when I cracked the silliest jokes in the world but you laughed anyway// no one knows that you're not here anymore and then maybe you are//
+
+my friend tells me that I'm getting better with how I write imagery// it's been more than three years now and I still do not know how to describe you without completely falling apart// it's just that this room in my house was always so full and happy and now it's always so dark and empty and no one does anything about it you know what I mean// like the book you gifted me a few years before you left; I've never found the courage to read it but I tear up every single time I look at it// every day I listen to the same song on repeat that reminds me of you and hope that I can hold on to you a little longer// every where I go I carry you in my heart, I carry your heart in my heart//`},
+      {title:'I hope you never have to need poetry',body:`I hope you never have to need poetry
+even half as much as I do
+
+I keep reminding myself how it would be the biggest injustice in this world
+for me to not write myself into the most beautiful poem this world has ever known
+which is to say that I almost did not write this poem.
+
+I've been so busy saving everyone but myself,
+I've forgotten what it feels like to be touched without flinching,
+to be loved, without preparing my heart for heartbreak,
+to heal, without thinking I'd have to do it again and again, all over again.
+
+I did not think I'd make it through today,
+to be honest, I almost didn't;
+I told myself that if I can make it through this, I can make it through anything.
+
+Today was the biggest reminder I've ever gotten to be kind to myself,
+almost as kind as I am to everyone but me, if not more.
+The hardest thing I've ever had to do was to forgive myself;
+I call myself a coward because I still haven't been able to do that completely.
+
+I spent so much of my life thinking about what I could have been,
+so much of it passed while I kept feeling sorry for all that I'm not.
+I look at myself like a puzzle that I've never been able to solve,
+every day I lose another piece instead of finding one.
+I stand in front of the world to say that I'm struggling and the world calls me brave,
+which is to say that this world looks at me through a pair of eyes
+I constantly wish I could see myself through.
+
+The last time someone told me that they loved me was just two hours ago,
+I do not remember the last time I told myself that,
+I do not remember believing that.
+I was 18 the first time I tried writing a love poem for myself, but couldn't;
+every poem I've ever written since then has been a reminder of that;
+to wish someone poetry would be to wish someone the biggest loss this world has ever seen;
+I hope you never have to need poetry even half as much as I do.`},
+      {title:'Stupid, stupid journal entry on a stupid, stupid friday evening',body:`I've been writing this poem for a while now, on stupid, stupid growth on stupid, stupid Tuesdays evenings; I thought I was everyone I've ever wanted to be, and then I crumbled back into everything I once was// it takes so much to build yourself back together after breaking down// falling apart// breaking down// falling apart// it's funny how I'm still all the people I thought I'd left behind in all the ways that I laugh// walk// move// feel// am// in a dream I never want to see again, I crash and burn into an ocean so vast, I forget where it starts// which side is up// I'm drowning// I'm scared// I never learnt how to swim because I'm so damn scared// everyone I've ever loved leaves me alone in this dream and it's funny how one day we can have the world in the palms of our hands and the next day, every bit of this world falls apart// I make myself a makeshift home out of lego blocks and I'm still falling apart// everything/ everyone I've ever loved is falling apart// I write the most when I'm the saddest and honestly I wish I wasn't writing// I wish I didn't feel as much as I did// I wish I didn't have to write// I wouldn't wish poetry on anyone// I hope you can be everyone you've ever wanted to be but never a poet// I wish you healing// it aches to exist on stupid, stupid Friday evenings when my world is crumbling apart and I do not know how to say that it is// how to ask for help in a language you do understand// so I crumble back into silence and nothing// and I hope that you can remember me as kind// learning to be kind// trying to be kind// struggling so incredibly hard to be kind// one day I'll get there//`},
+      {title:'Stupid thoughts about stupid uncertainty',body:`everything is new and scary and exciting and in a language that I do not understand// I am not ready for this yet// my world keeps falling apart and building itself back together in 47 different ways every single day// a stupid sticky note in my room asks me to run towards what frightens me the most// I have been brave enough to dream// but my legs keep trembling// everything makes so much more sense from the outside looking in// I'm so used to being here, I'm still learning who I'd be if I weren't// calling something stupid does decrease its intensity// stupid, stupid dreams; stupid, stupid, stupid fears// this big blue cloud of sadness hits in stupid, stupid waves//
+
+I wish I didn't have to feel everything with this stupid intensity// I wish I knew where I was going// I'm still, still struggling to be brave// I always want to be writing every single day of my life// stupid, stupid metaphors about love, and tenderness, and music, and you, and my big, blue, beautiful dreams, and this big blue cloud of sadness that refuses to leave, and beautiful, yellow spring, and soft, silent love, and loud, big laughter, and purple, purple skies, and tomorrow// big, blue, beautiful stupid tomorrow where I'm everyone I've ever wanted to be and everything makes sense and it aches a little less and my world is purple and blue and all colours at once, at full intensity and I'm a little less terrified and a little more brave and I know how to say that in a language that I'm still beginning to learn//`},
+      {title:'Reminder',body:`I can't remember the last time I actually felt how I felt without constantly thinking about how I should be feeling instead// in this poem, there are no escapes// I've spent more than half of my life looking for escapes// my knees start to shiver every time someone asks me a difficult question// my hands tremble every time I try to write poems about things I haven't had the courage to say out loud yet// the last time I wanted to say I wasn't okay, I said, "I'm sorry" and apologized for all the things I did not feel sorry for before cutting the call// I like to call myself brave// I'm constantly looking for the easy way out// I've spent more than half of my life being so afraid of March, I used to physically fall sick to escape it//
+
+the last time I felt like this, I changed the world, my world, which is to say that I will run a marathon, I will start a business, I will even stand in front of the entire world to read out my most honest poems, but not talk about how I feel// on most days I look at myself as a gush of feelings// there is no control, yet I'm constantly looking for the locus// I believe I'm the happiest when I do not think about how I'm feeling//
+
+I do not like to think about how I'm feeling, which is to say that the last time I had to think about how I'm feeling, I ran into the ocean and stayed there till I absolutely couldn't anymore// the ocean was my biggest, greatest fear till I was 16// when I was 12, I almost drowned in the ocean// there are no escapes in the ocean// I'm waiting for the day I do not have to be writing poems about the ocean anymore// I'm waiting for the day I do not have to be constantly looking for an escape anymore, one foot always out the door// when I say "I'm here now," it is always a reminder// I'd like to remember how I feel right now, in this exact moment// I'd like to be remembered as brave//`},
+      {title:'Ask me what my writing style is & I will tell you that it is uncontrollably loud grief',body:`one day they will take this up in a poetry class
+somewhere in the middle of the mountains
+in the middle of the oceans in the middle of the world
+& talk about her sadness as a metaphor
+for constantly doing everything she knows she should
+not be doing
+and there probably wouldn't be any fresh roses to write
+about anymore
+no flower to hide in the pages of an old book
+more annotations than print
+"fall in love with me loud and fierce"
+
+i wonder what the class would look like;
+what would they think of the word "blue"
+would it have as much meaning as it does now;
+how beautiful it is to witness love in first person
+they will talk about her in past tense
+say they love her as a concept-
+she has written so much more about grief than love
+how do you spend the rest of your life grieving what never was?
+
+someone in black with broad rimmed glasses
+would point out the lack of capitalization;
+the i- more of an imaginary concept than a real person
+as opposed to I; still more of an imaginary concept than a real person
+i am still becoming
+which is to say that grief takes so much more than you ever had
+how do you go back to anywhere but here?
+someone might tear up; say they have wanted to read this
+for as long as they've known how to read- will there be a coffee break?
+will there be curtains not allowing the sunlight through?
+will it ever make sense to someone who was never here?
+
+how do you feel something that crumbled someone else's world entirely
+and left behind nothing but deafeningly loud grief;
+lived experiences my foot-
+they will probably go back to living their lives
+after reading how devastated she was how she cared for a plant
+and it was the biggest loudest happiest thing she did all of that day
+all of that year;
+they will probably think about that plant later
+eating a cookie near a fireplace
+crumbs falling all over the floor
+and that would be the end of it
+and this would fade back into where it came from;
+small & silent.`},
+      {title:'Healing in the aftermath of love',body:`the more I think I know about this world, the less I actually do;
+my world ends an average of 4 times a day and I almost let it,
+because I'm too fearless and scared at the same time;
+I woke up dreaming for the past few days,
+which is code for falling in love and breaking apart
+and falling in love again.
+how do you write a poem without falling in love
+with everyone and everything you've ever met in your entire life?
+the third time I told the same story today
+I forgot what that story meant to me.
+
+I wonder if our stories only derive their meaning from how
+much we believe in them,
+which is to say that sometimes a shooting star would just be a
+shooting star,
+and sometimes it would be our entire universe condensed in
+just a 2 second long wish
+for everything we've ever known we've ever wanted,
+and sometimes it would just be an ordinary sky,
+even though there is nothing even minutely ordinary about
+the sky.
+
+how incredibly sad would it be for you to have to tell stories you
+do not believe in anymore,
+to talk about love without being in it so helplessly,
+the last time I thought my world was finally starting to piece
+itself back together,
+it fell apart into more pieces than I could have ever counted,
+I'm still picking up the pieces,
+I've only ever known healing in the aftermath of this devastation,
+which is to say that we're only gentle with ourselves when we're
+in pain,
+and sometimes not even then.
+
+it's so scary to know that the aftermath of love is nothing
+but pain on most days,
+and devastation and healing on others.
+how many times can you pick up the pieces without
+completely falling apart with them?
+or not look at love as something you constantly need to earn
+or deserve
+but something you're so incredibly worthy of, just because
+you are.`}
+    ]
+  },
+  {
+    id:'growing', title:'of growing', accent:'#6d8a65',
+    bg1:'#0d1a0f', bg2:'#142016', particleMode:'leaves',
+    melody:[['C4','4n'],['E4','4n'],['G4','4n'],['A4','4n'],['G4','4n'],['E4','4n'],
+            ['D4','4n'],['C4','2n'],['E4','4n'],['G4','4n'],['A4','4n'],['C5','2n']],
+    tempo:60,
+    poems:[
+      {title:'To find poetry again',body:`(i) to run without knowing what you're running toward. to reach without knowing if that is what you wanted. to look through a lens that is everyone's but yours. to find what is meant for you when you stop looking for it.
+
+(ii) to find tenderness in rewriting your words - to remember who you were when you first wrote them. to know you're not the same anymore and to be okay with that.
+
+(iii) to grieve all that could have been; all that you could have been. to attend funerals of all the realities that aren't. to be okay with all the joy that isn't.
+
+(iv) to write yourself into a love poem that only you can perfect. to remember to write through the sorrows and joys. to remember that there will be sorrows and joys.
+
+(v) to grow a garden, soft in the palms of your hands, to water it, to nurture it, to be kind to it. to reach out and find the same kindness within yourself. for yourself.
+
+(vi) to be okay with not finding it.
+
+(vii) to keep looking for it - in the cup of coffee, the evening walk, the same song on repeat, the same joke, and loud laughter. over & over & over again.
+
+(viii) to keep trying.`},
+      {title:'My life\'s work is to be worthy of my own love',body:`my life's work is to be my worthy of my own love//
+
+letting forgiveness be the prayer I wake up to// dancing to the smell of honey-ginger-lemon tea for one// reminding myself that it is okay to feel as much as I do// so much more than I do// to heal during Sunday afternoon haircuts// Saturday evening mint cappuccinos// Wednesday night 10-minute long dance parties in the middle of my living room//
+
+to heal by learning how to unhurt a person// learning that it takes time// giving it time// to hold myself together// in the lilies I bought for myself last Friday// growing in my room// blooming// where they're planted// in the concrete// the rubble// I remind myself that it is okay to be afraid of the aftermath// of the present// I have for myself// my name on the tip of my tongue// not an apology anymore//
+
+like my loud, unafraid laughter// my endless poem// I am my own favourite music// the same song, on repeat, over and over and over again// yet I do not get tired// I never get tired// of trying// of feeling// of being// so sunny// so yellow//
+
+It takes courage to be so yellow// & paint myself a billion different colours every single day// shades of beginnings on the tip of my tongue// I'm sorry// let me try again// let me be better// I am trying// I am trying// I am trying// every day// to get there// to become// my own becoming// everything I've ever wanted to be//`},
+      {title:'Thoughts on turning 23',body:`thoughts on turning 23 like what do I do with all this future ahead of me, how do I fill it up with laughter and love and unhurt// how do I unhurt a person in a language that I'm still struggling to learn// I'm sorry- I'm trying- I'm sorry- growth is painful, I'm sorry, I'm still trying, I'm still sorry// how do I learn love as if it is the only feeling I've ever known/ wanted to know// the sky is still too big and I'm still afraid of all the hurt I've already been//
+
+how do I spell courage in a language I have never learnt before like how do I learn to say my "I love you's" out loud without completely breaking down// how do I fit forgiveness on the tip of my tongue so it becomes more an introduction than anything else// I forgive you I forgive you I forgive you I forgive you// I'm sorry I'm still trying//
+
+thoughts on turning 23 like how do you grow without tearing apart// falling apart// breaking apart// where do I go if I'm not where I wanted to have been by now// the sun still sets an average of 44 times a day for me and I still carry my grief like the biggest introduction I can utter out loud// like how I want my poems to be the biggest reminder that I'm not alone// I'm getting there// I will get there// it is okay for me to be where I am right now, I'm exactly where I need to be// I'm sorry I'm still trying//
+
+like how reminding myself that it gets better is the biggest prayer I've ever known or will ever learn to know// it gets better// it does get better// how healing is a journey and I've been on my way for far too long to not know that there is a gorgeous sunset ahead// thoughts on turning 23 like every day I'm a day closer to becoming everyone I've ever wanted to be and it is painful and scary and exciting and scary again for so many reasons but I'm getting there// & I'm so proud of myself for getting there//`},
+      {title:'On writing more about me by actually writing more about me',body:`Today, I sat down to realise the absurdity of wanting to write about me while constantly writing about everything but me. All of my life, I have actively tried to disguise my own story through layers and layers of metaphors.
+
+[Redacted] says my art becomes (so much) more beautiful & powerful when it is more of me. I've never learnt to look at me the way [Redacted] looks at me.
+
+I have often struggled with vulnerability and the idea of shame that is associated with it. Why does shame always walk in before vulnerability does? Why does anyone ever have to be ashamed of crying? To feel everything there is to feel in this world without restraint is nothing but a blessing.
+
+[Redacted] says sorry before he says, "I miss you." He probably doesn't know that saying "I miss you" is not a form of surrender. He wipes his tears off before he lets even a single show up. He goes red, more so in embarrassment of the pain, than because of it. How embarrassing to be hurt and to let yourself feel it?
+
+I still struggle to understand why this world rewards indifference so much. Who woke up one morning and decided that feeling everything so intensively is nothing but a sign of weakness. To let yourself be controlled by your heart is a form of surrender. To hold back your tears and swallow your feelings is courage. Who decided that the more you feel the less of this world you deserve?
+
+Every day it feels like I'm harbouring a little secret that could save everyone I know. To allow yourself to feel everything so intensively is the bravest act in this world. Every day I read poems that make me feel like the world isn't ending after all, I drink iced coffee and tear up while listening to the same song for the forty eighth time that day, and write the same poem hoping the world will feel it as intensively as I did when I wrote it.`},
+      {title:'On the generous days',body:`On the generous days, I giggle myself back to life
+I do not wake up heavy to my own sadness, I do not skip the sunsets,
+I write myself back into the poem I know I am,
+I believe in poetry all over again,
+go back to not knowing what "love lost" means,
+I do not cry myself awake, I do not wake up wishing I didn't,
+I braid my hair into healing;
+breathe in and breathe out till I remember how to,
+I buy flowers for myself,
+whisper "I love you's" in languages only I understand
+I journal myself back into a person
+I remind myself that there will always be flowers and they will always be important to me,
+I remind myself that I will always have poetry
+And I colour my days a little lighter
+a little less blue//`},
+      {title:'We think we\'re in full bloom',body:`we think we're in full bloom but there's always so much more ahead of us// last year I wrote how I cared for a plant and it was the biggest scariest thing I did all summer// sometimes I think how we're less us and more everyone and everything we've ever been in love with// I wonder if you know I think about you as much as I do// I wonder what my full bloom looks like, I know I'm nowhere even near it yet// I wonder how I'll choose to look at myself in my full bloom// I wonder who I'll be in my full bloom or if I'll ever know how to take care of myself in it//`}
+    ]
+  },
+  {
+    id:'gentle_things', title:'of gentle things', accent:'#b87878',
+    bg1:'#1a0d10', bg2:'#201215', particleMode:'petals',
+    melody:[['F4','4n'],['A4','4n'],['C5','4n'],['A4','4n'],['G4','4n'],['F4','2n'],
+            ['G4','4n'],['A4','4n'],['C5','4n'],['D5','4n'],['C5','2n'],['A4','4n'],['G4','4n'],['F4','1n']],
+    tempo:52,
+    poems:[
+      {title:'I wish you healing',body:`soft dancing in the middle of your living room
+singing that makes your heart beat faster
+laughter that gives you a bellyache
+movies that make you believe in more
+longs walks under the setting sun, settling your
+thoughts
+shoes that grip you perfectly
+hugs that linger a lil longer
+scarves by the door
+poetry that makes you feel seen
+rooms that light up as soon as you walk into
+them
+welcoming hands, hearts, doors
+love that feels warmer, softer, lighter, easier,
+steady, like you know the outcome already
+patience, dew drops, honey
+iced coffees
+and joy
+joy that spreads
+joy that wants to spread
+joy that arrives
+& joy that stays
+a lil longer`},
+      {title:'Stupid things that gave me hope today',body:`the flowers in my bedroom are still alive and even though every day feels like the worst kind of winter, it's still spring and I'm not alone// I'm never alone// the world loves us a lot more than we think it does//
+
+I'm still learning to love myself a lot more and a lot easier// i've been wanting to/ meaning to write every day and every day aches a little less and a little more but every day aches different// i do not feel the same pain over and over again// i'm healing in my own stupid, stupid ways// i'm kinder to myself and i remember my disorder will never go away but that I will learn to manage it better and even though i hate talking about it, i can still talk about it//
+
+i speak a lot softer when I'm nervous and I'm almost always nervous// the sun set a little earlier than usual yesterday but it set so beautifully i wish it could set again at the exact same angles//
+
+there is so much space that I'm learning to hold for the people i love// when i ask you if you're okay and you tell me you're not, i know how much courage it takes// you tell me a story about how your entire world crumbled apart in pieces and i do not tear up because im learning to be brave for you//
+
+[Redacted] asks me to write about the things that scare me the most so i write about the ocean and my disorder and growth and love// im probably less scared of the world ending than i am of falling in love// I'm still learning to love myself the way i want to be loved//
+
+everything i know is so difficult but everything i know is also a reminder that i will get through and the other side is so damn beautiful// i know a lot more gorgeous sunsets await me there and i'm excited to watch them`},
+      {title:'Gentle things that remind me of gentler things like',body:`gentle things that remind me of gentler things like
+
+(i) I have never been so excited to learn a new language before (ii) spring this year will be so beautiful and so free (iii) my favourite poet tells me that the theme of this year is "23 and free"; i feel it too(!!) (iv) i'm learning to laugh through my eyes (v) i might actually learn to be okay with the tenderness you feel for me (vi) my world has a lot more laughter with you in it (vii) there are fresh blooms in my plant; the one that wasn't going to last longer than a week (viii) i have gotten through everything I thought I would never get through, i know i'm a lot braver than I think i am
+
+(ix) i hold my heart as I think of you; there is nothing more beautiful in this world than (writing) a love poem (x) i'm not sure if i'm in love but everyday is a new love poem to me (xi) i write the most when i'm very sad or very in love; i think i'm both right now (xii) i learnt to leave my grief behind today (for a little while) (xiii) we'll get through this (rough patches are just that, rough patches) (xiv) i see a rainbow ahead and it hasn't even started to rain yet (xv) i know you're writing a love poem for me too (xvi) i know spring this year will be so beautiful and so free and I'm so excited for it!!`},
+      {title:'Dots obsession (on yayoi kusama)',body:`blue dot; I'm still learning to fall in love with all the parts of me that I've always wanted to hide from this world; yellow dot; this world doesn't seem half as big and scary with you in it; red dot; i'm not afraid of dreaming but i am so afraid of my dreams; green dot; i'm still learning to look at uncertainty as possibility; white dot; i'm learning to let go of my grief, palms spread open, facing upwards, facing the rain, facing the world; blue dot; i miss the rain; i miss it so much; purple dot; i wish you were here;
+
+orange dot; i'm still learning to paint my world in all the colours i've never known before; yellow dot: i'm still learning tenderness the only way i've ever been taught, with everything that i have; red dot; maybe the world does stop spinning for an entire second when I think of you; blue dot; i'm doing okay, i'm doing okay, i'm doing okay; violet dot; there is so much more colour in this world than we'll ever know and i hope we find it, together;`},
+      {title:'Things that are growing with me right now',body:`things that are growing with me right now
+
+my love for all that I have
+the flowers
+in my living room hope
+that I will make it to
+tomorrow I will be better
+my patience
+my courage
+my list of affirmations
+the sticky notes on my mirror
+the memories
+on my wall silly things
+that reminds me of you
+my gratitude
+for having met you
+the building behind my house
+the homes in the building behind my house
+the fragrance of the scented candles
+in my bathroom as a form of
+self-care
+banana shine hair mask
+glowing aloe vera face pack
+stupid fancy lovely lip tint
+my heart
+for all the things I'm yet to do
+my dreams
+my to-do lists
+how comfortable this pen and this
+diary feels in the palm of my hands
+my collection of scrunchies
+my love
+for me
+the distance between the old you and the
+new you
+the distance between me and you
+my grief
+my grief
+my grief
+the idea (my idea) that someday
+it will all be better
+little love for me
+little love for you
+so much love for you
+me, as a plant
+me, as a plant, at a party
+me, as a plant, at a party, dancing
+me, as a plant, at a party, dancing, laughing,
+me, as a plant, at a party, dancing, laughing, excited for tomorrow
+me, as a plant, at a party, dancing, laughing, excited for tomorrow,
+growing.`}
+    ]
+  },
+  {
+    id:'wandering', title:'of wandering', accent:'#a07840',
+    bg1:'#1a1208', bg2:'#201810', particleMode:'seeds',
+    melody:[['D4','8n'],['E4','8n'],['F#4','4n'],['A4','4n'],['B4','8n'],['A4','8n'],
+            ['F#4','4n'],['E4','4n'],['D4','4n'],['C5','4n'],['B4','4n'],['A4','2n']],
+    tempo:68,
+    poems:[
+      {title:'To the lady at the Ice-Cream counter at Café Zapa in Cesky Krumlov',body:`I know you sound kinder
+in your mother tongue
+to your mother tongue,
+less threatening
+more welcoming
+more forgiving;
+
+I forgive you,
+for hearing my foreign accent
+before any of my words;
+
+I will repeat them for you,
+till cereal sounds like cereal
+and not seizures
+to your white ears;
+
+how sorry I am
+you have to strain your ears,
+to listen to what I have to say,
+that you have to listen to what I have to say
+at all.`},
+      {title:'Homecoming',body:`I treat myself to happiness,
+gluten free linzer cake with curd & fruit,
+& I do not know how not to be in love
+with everyone & everything around me.
+
+I taste tenderness in the shape of breadcrumbs,
+the texture of the softest smile
+spreading across my lips
+slowly
+with every sip of my coffee,
+my world pieces itself back together,
+I say, "I'm okay, I'm happy here,"
+& I believe every word!
+
+In the streets of this dream I unlearn dancing,
+I re-learn dancing,
+tapping to the rhythm of my laughter,
+loud, beautiful, fearless;
+everything is music to me,
+the biggest, most beautiful song ever,
+& I hear myself falling in love
+with every bit of me hidden from this world.`},
+      {title:'It is summer and according to my brother, my core competency is feeling',body:`It is summer and I dream of mangoes and art and tenderness,
+of dancing with ease and holding on to each other softly,
+of unhurting a person in every language I've ever known how to speak,
+of laughter and forgiveness and exhaling everything I've ever held on to,
+breathing out, letting go, exhaling in all colors I've ever learnt to see,
+painting skylines, painting over skylines, owning skylines;
+I write my name over the sky and call it my own, and then it is.
+
+It is summer and I'm everyone I've ever wanted to be,
+my favourite tree Noor Muhammad is still doing okay,
+the municipal corporation of Shimla isn't as lonely as it used to be,
+I'm not as afraid of change anymore,
+uncertainty overwhelms me in all ways possible,
+but also excites me in more ways than I can count;
+the flowers in my plants bloom so loudly I cannot hear silence for miles,
+and when I do hear the silence, the soft, tender silence, I'm comfortable in it;
+I learn to be okay in it; and everything feels a little more okay to me.`},
+      {title:'Lonely things that feel like other lonely things',body:`sunsets, promises, letters, abandoned letters, posted letters, love letters,
+lonely love letters, letters that were never posted, letters that were
+almost posted, letters that were never read, letters that were read too
+many times,
+
+leaves, growing leaves, falling leaves, decaying leaves,
+
+sunsets, sunsets you almost watched, sunsets you wanted to watch but
+couldn't, sunsets you missed, sunsets you could never watch, sunsets you
+watched but can never forget,
+
+stars, skies, big fat lonely skies, rooms that remind you of other rooms,
+people that remind you of other people, scents, perfumes, photographs,
+photographs that you clicked, photographs that you never clicked,
+photographs that you almost clicked,
+
+love, the temporariness of love, the permanence of love, the refusal of
+love to leave even after love has left, the aftermath of love,
+
+sunrises, sunrises that you watched, sunrises that you wanted to watch
+but couldn't, sunrises that you can never stop thinking of, sunrises that
+you missed,
+
+winters, the cold during winters, the warmth during winters that you can
+never stop thinking of,
+
+sunsets, more sunsets, longer sunsets, the permanence of sunsets that
+you can never let go of,
+
+love letters, photographs, mountains, rivers, beaches but without those
+you love, parties where you can never find yourself, parties where you're
+constantly looking for yourself,
+
+the cold, the sun, the sun without you and the sun with you,
+
+red lights, roads, street signs, stop signs, mixed signals, mixed flags, red
+flags, red flags, red flags,
+
+songs that remind you of other songs, songs that remind you of other
+people,
+
+music, memories, music, memories, music
+
+love, more love, less love, the other side of love, the opposite of love,
+
+loneliness, the opposite of loneliness, the loneliness of being lonely and
+not knowing how to leave, leaving, loneliness that feels like other
+loneliness,
+
+lonely trees, trees that were never written love letters to, trees that were
+never loved enough,
+
+playlists that were never played, candles that were never lit, fairy lights
+on Christmas, fairy lights all year round,
+
+love, love, love, love, love, the loneliness of love, the lack of love, the
+excess of love,
+
+unanswered texts, answered texts,
+
+more love, skies, yellow lights, empty roads, emptier streets, December,
+the lack of love, the excess of love, sunsets, promises, love letters, love,
+the loneliness of love`}
+    ]
+  },
+  {
+    id:'love', title:'of love', accent:'#c4a0c0',
+    bg1:'#160a20', bg2:'#2a0f1e', particleMode:'hearts',
+    melody:[['Bb3','2n'],['D4','4n'],['F4','4n'],['G4','4n'],['Bb4','2n'],
+            ['A4','4n'],['G4','4n'],['F4','2n'],['D4','4n'],['Bb3','2n'],
+            ['F4','4n'],['G4','4n'],['Bb4','4n'],['D5','2n'],['C5','4n'],['Bb4','1n']],
+    tempo:46,
+    poems:[
+      {title:'In the Quieter Moments',body:`It's 11 on a Friday night,
+mumma softly hums
+jagjit singh's
+"tumko dekha toh yeh khayal aaya"
+& it's not raining
+but it feels like it is;
+papa is in the kitchen,
+making green tea for two,
+mumma in the bedroom,
+swaying to the rhythm
+of the rain,
+the tender laughter of their routine,
+the unfiltered habits,
+the burps and the wrinkles,
+the gentle dance between care & concern,
+of more fruits on the other's plate,
+of health reports on the refrigerator,
+of twenty phone calls a day, still,
+the same news on the television
+for 30 full years,
+but still, the same excitement,
+the same curiosity,
+of getting to know each other,
+in the quieter moments,
+of falling asleep next to each other
+snoring next to each other,
+but softly.`},
+      {title:'If you are what you love, I am',body:`if you are what you love, I am
+
+every sunset I've ever watched/ the flowers growing in my plants/ driving on the highway/ the sound of the rain in my parent's bedroom/ mangoes on hot summer afternoons/ my brother's excitement when he plays chess with me/ poems that make my world revolve around faster/ my father's resilience/ the five minutes before the sunrise/ the poems I've written for you/ Belgian waffle sundaes on my birthday/ your tenderness/ the sun, obviously/ "the Lumineers" with the windows rolled down/ my mother's laughter/ your patience/ the full moon/ your hand in mine/ my courage/ my favourite tree, Noor Muhammad/ you/ how I feel at home around you/ my favourite song on repeat/ your voice/ a long walk till the sunrise/ what being around you feels like/ purple coloured horizons/ rearranging my metaphors for you/ my poetry/`},
+      {title:'Learning to be okay with tenderness',body:`you return to me in the shape of a poem I thought I'd never find again,
+& for a minute, I forget all the emptiness on the page,
+the edges are soft, tender, blooming,
+here, you grow flowers for me
+and I almost let you;
+I remind myself
+that it is okay for me to let you sing for me,
+care for me,
+look through my things
+rearrange me,
+be this metaphor for me;
+the biggest, fullest love poem I've ever known is yet to be written,
+write it with me, slowly, steadily;
+
+in this garden where I've only ever known floods or droughts,
+show me spring,
+show me how it is okay for it to be spring,
+how it is okay for me to hope for spring,
+hold my hand, walk me through this spring;
+step on lilacs and laughter with me,
+everything I've ever known is a poem to me,
+read out my poetry to me, tell me it is okay for me to be scared,
+tell me you're scared too so I'm not alone in my scared,
+tell me I'm okay, so I don't struggle to remember it,
+tell me you're okay too,
+dream with me,
+on Saturday nights and Tuesday afternoons,
+in the middle of our laughter, in the middle of our tears,
+dream with me so that I never forget how to,
+and come back to me,
+always,
+in the shape of a poem,
+that I'm still learning, re-learning, learning how to write.`},
+      {title:'To learn love as the greatest prayer I\'ve ever known',body:`to learn love as the greatest prayer
+I've ever known
+
+In a prayer I do not write,
+I learn to roll gratitude off my tongue before anything else,
+I learn that the softest sunsets are always watched in whispers,
+so I'm in a plane with the most beautiful sunset in my entire life and I go to sleep instead,
+because I know that there'll be more, plenty more,
+to know this sense of safety, soft in the palms of my hands is the greatest privilege I've ever known,
+it's like a sweater my father's had for over twenty years now
+And I wear it and I know that nothing can ever go wrong;
+
+I learn to find love in the most unexpected of places,
+there are extra flowers growing in the plants I never watered,
+I return home to pictures and portraits that make me glad I did,
+there are paintings over my bed that show me how much of this universe I own;
+
+I learn love as the only feeling I ever want to live for, to live towards,
+so when I hold my hands out, palms facing upwards, not sure what kind of storms I'm going to have to brave today,
+I always know that there are hands near mine, protecting them from blisters I've always been afraid of,
+
+I learn that love sits in the quietest corners of the biggest rooms,
+so I learn to read in the spaces between words,
+in between what was never said and what was said but never understood;
+
+I learn love through the way I see people clicking photographs, always focusing the most on the parts they love the most,
+I have an album full of the people I love just laughing,
+everything is a blur but I can hear them laugh from four years away, and it's almost as if they're here,
+my Polaroid album is a reminder of how full my life really is;
+
+My friend looks at me and says she is so proud
+of how much I have grown,
+And I look at her and tell her
+I do not recognise the person I was two years ago,
+I was still loved two years ago,
+
+I run out of languages to say thank you to the people who love me
+even on days I do not love me,
+my favourite poet says,
+"thank you is the biggest poem I've got inside of me"
+the biggest poem I've ever known is to be loved without asking for it,
+to be loved without being asked for anything for it,
+the last time I fell in love this big and blue and deep,
+I knew that there was no coming back from it,
+And that's okay with me,
+I'm safe here.`},
+      {title:'where else would i be',body:`My favourite fridge magnet is a royal white panda
+from a country I have never visited
+& my favourite hug is 7000 miles away
+
+There is a strange emptiness in living my life
+in the absence of you
+
+I know I am complete, even in the absence of you
+in the life I have grown for myself
+blooming exactly where I am planted
+
+But the thing about the sunflower is
+it shines a lot brighter under the sun
+
+and while the age-old cliché would call you my sunshine
+I'd simply tell you that
+I'm much happier when you're around
+
+I often wonder
+where else would I be
+if not in love with you?
+
+in the absence of you
+sometimes all I can think of
+is the absence of you
+
+the thing about grief and distance
+and holding yourself together is
+one second you're completely fine,
+and the next you're crying your eyes out
+at the thought of a royal white panda fridge magnet
+
+and while it's not easy
+I'd argue none of it is
+I truly do hope that one day
+it will feel like
+all of it
+was worth everything it took.`}
+    ]
+  }
+];
+
+// ════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════
+const S = { screen:'intro', themeIdx:0, poemIdx:0, soundOn:true, transitioning:false, musicReady:false };
+
+// ════════════════════════════════════════════════════
+// CANVAS / PARTICLE SYSTEM
+// ════════════════════════════════════════════════════
+const bgCanvas = document.getElementById('bg-canvas');
+const bgCtx = bgCanvas.getContext('2d');
+const fxCanvas = document.getElementById('fx-canvas');
+const fxCtx = fxCanvas.getContext('2d');
+
+function resizeCanvases() {
+  bgCanvas.width = fxCanvas.width = window.innerWidth;
+  bgCanvas.height = fxCanvas.height = window.innerHeight;
+}
+resizeCanvases();
+window.addEventListener('resize', resizeCanvases);
+
+// Background color lerp
+let bgC1 = [13,11,8], bgC2 = [13,11,8];
+let tgtC1 = [13,11,8], tgtC2 = [13,11,8];
+let bgT = 1;
+
+function hexToRgbArr(h) {
+  return [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)];
+}
+function lerpArr(a,b,t) { return a.map((v,i)=>Math.round(v+(b[i]-v)*t)); }
+
+function setThemeBg(theme) {
+  tgtC1 = hexToRgbArr(theme.bg1);
+  tgtC2 = hexToRgbArr(theme.bg2);
+  bgT = 0;
+}
+
+// ── Plants (growing theme) ──
+const plants = [];
+const MAX_PLANTS = 14;
+function initPlants() {
+  plants.length = 0;
+  const W = bgCanvas.width;
+  for (let i = 0; i < MAX_PLANTS; i++) {
+    plants.push({
+      x: (i / MAX_PLANTS) * W + (Math.random() - 0.5) * (W / MAX_PLANTS),
+      maxH: Math.random() * bgCanvas.height * 0.38 + bgCanvas.height * 0.1,
+      h: 0,
+      speed: Math.random() * 0.4 + 0.15,
+      sway: Math.random() * Math.PI * 2,
+      swayAmp: Math.random() * 12 + 4,
+      hue: 100 + Math.random() * 40,
+      sat: 28 + Math.random() * 18,
+      lum: 25 + Math.random() * 15,
+      leaves: []
+    });
+    const p = plants[i];
+    for (let j = 0; j < 5; j++) {
+      p.leaves.push({ pos: (j + 1) / 6, side: j % 2 ? 1 : -1,
+        angle: Math.random() * 0.4 + 0.25, size: Math.random() * 14 + 7 });
+    }
+  }
+}
+
+function drawPlants(ctx) {
+  const W = bgCanvas.width, H = bgCanvas.height;
+  for (const p of plants) {
+    if (p.h < p.maxH) p.h = Math.min(p.maxH, p.h + p.speed);
+    p.sway += 0.008;
+    const swayX = Math.sin(p.sway) * p.swayAmp * (p.h / p.maxH);
+    const topX = p.x + swayX, topY = H - p.h;
+
+    ctx.beginPath();
+    ctx.moveTo(p.x, H);
+    ctx.quadraticCurveTo(p.x + swayX * 0.5, H - p.h * 0.6, topX, topY);
+    ctx.strokeStyle = `hsla(${p.hue},${p.sat}%,${p.lum}%,0.7)`;
+    ctx.lineWidth = 1.2;
+    ctx.stroke();
+
+    for (const leaf of p.leaves) {
+      if (p.h / p.maxH < leaf.pos) continue;
+      const lx = p.x + swayX * leaf.pos;
+      const ly = H - p.h * leaf.pos;
+      ctx.save();
+      ctx.translate(lx, ly);
+      ctx.rotate(leaf.side * leaf.angle + (p.sway * 0.3));
+      ctx.beginPath();
+      ctx.ellipse(leaf.side * leaf.size * 0.5, 0, leaf.size * 0.35, leaf.size, Math.PI * 0.15, 0, Math.PI * 2);
+      ctx.fillStyle = `hsla(${p.hue},${p.sat+5}%,${p.lum+5}%,0.22)`;
+      ctx.fill();
+      ctx.strokeStyle = `hsla(${p.hue},${p.sat}%,${p.lum}%,0.5)`;
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+}
+
+// ── Wandering landscape — rolling hills + movement lines ──
+let wanderOffset = 0;
+function drawWanderingLandscape(ctx) {
+  const W = bgCanvas.width, H = bgCanvas.height;
+  wanderOffset = (wanderOffset + 0.4) % W;
+
+  // Moving speed lines (like train window)
+  ctx.save();
+  ctx.globalAlpha = 0.06;
+  ctx.strokeStyle = '#c9956c';
+  ctx.lineWidth = 0.8;
+  const lineCount = 18;
+  for (let i = 0; i < lineCount; i++) {
+    const y = H * 0.25 + (H * 0.45) * (i / lineCount);
+    const speed = 0.5 + (i / lineCount) * 1.5; // parallax
+    const offset = (wanderOffset * speed) % W;
+    const len = W * (0.08 + (i / lineCount) * 0.18);
+    // Draw dashes across width
+    for (let x = -W + offset; x < W * 1.5; x += W * 0.35) {
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + len, y);
+      ctx.stroke();
+    }
+  }
+  ctx.restore();
+
+  // Rolling hills silhouette at bottom
+  ctx.save();
+  ctx.fillStyle = 'rgba(42,30,16,0.55)';
+  ctx.beginPath();
+  ctx.moveTo(0, H);
+  // Hill 1
+  ctx.bezierCurveTo(W*0.05, H*0.7, W*0.18, H*0.62, W*0.28, H*0.68);
+  // Valley
+  ctx.bezierCurveTo(W*0.35, H*0.72, W*0.4, H*0.74, W*0.45, H*0.7);
+  // Hill 2 (taller)
+  ctx.bezierCurveTo(W*0.52, H*0.62, W*0.6, H*0.58, W*0.68, H*0.64);
+  // Valley 2
+  ctx.bezierCurveTo(W*0.75, H*0.68, W*0.8, H*0.72, W*0.85, H*0.68);
+  // Hill 3
+  ctx.bezierCurveTo(W*0.9, H*0.62, W*0.96, H*0.65, W, H*0.7);
+  ctx.lineTo(W, H); ctx.closePath(); ctx.fill();
+  ctx.restore();
+
+  // Tree silhouettes on hills
+  function drawTree(tx, ty, th) {
+    ctx.save();
+    ctx.fillStyle = 'rgba(32,22,10,0.65)';
+    // Trunk
+    ctx.fillRect(tx - 2, ty - th*0.3, 4, th*0.3);
+    // Canopy (triangle-ish)
+    ctx.beginPath();
+    ctx.moveTo(tx, ty - th);
+    ctx.lineTo(tx - th*0.35, ty - th*0.3);
+    ctx.lineTo(tx + th*0.35, ty - th*0.3);
+    ctx.closePath(); ctx.fill();
+    ctx.restore();
+  }
+
+  drawTree(W*0.14, H*0.7, H*0.09);
+  drawTree(W*0.22, H*0.68, H*0.07);
+  drawTree(W*0.55, H*0.65, H*0.11);
+  drawTree(W*0.62, H*0.64, H*0.08);
+  drawTree(W*0.88, H*0.68, H*0.09);
+
+  // Distant stars/lights (upper sky)
+  ctx.save();
+  ctx.globalAlpha = 0.18;
+  ctx.fillStyle = '#f0d88a';
+  const starPositions = [[0.12,0.08],[0.34,0.12],[0.55,0.07],[0.72,0.14],[0.88,0.09],[0.47,0.18],[0.25,0.2],[0.78,0.06]];
+  for (const [sx,sy] of starPositions) {
+    ctx.beginPath(); ctx.arc(W*sx, H*sy, 1.2 + Math.sin(Date.now()*0.001 + sx*10)*0.5, 0, Math.PI*2); ctx.fill();
+  }
+  ctx.restore();
+}
+
+// ── Silhouettes (love theme) — two people walking hand in hand ──
+function drawSilhouettes(ctx) {
+  // Ported from reference SVG (love_background_agy.html) — clean, simple shapes
+  // SVG viewBox 0 0 200 150 → mapped to canvas right side
+  const W = bgCanvas.width, H = bgCanvas.height;
+  const AL = 0.34;
+
+  // Scale: SVG is 200×150, we target ~35% of canvas width, bottom-anchored to H*0.90
+  const sc = W * 0.792 / 200;        // pixels per SVG unit
+  const ox = W * 0.80 - 100 * sc;    // x-offset so SVG center (100) → W*0.80
+  const oy = H * 0.92 - 150 * sc;    // y-offset so SVG bottom (150) → H*0.92
+
+  function sx(x) { return ox + x * sc; }
+  function sy(y) { return oy + y * sc; }
+
+  ctx.save();
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+
+  // ── Gentle hill ──
+  ctx.beginPath();
+  ctx.moveTo(sx(-50), sy(150));
+  ctx.quadraticCurveTo(sx(100), sy(120), sx(250), sy(150));
+  ctx.lineTo(sx(250), sy(160)); ctx.lineTo(sx(-50), sy(160));
+  ctx.closePath();
+  ctx.fillStyle = `rgba(196,160,225,${AL * 0.12})`;
+  ctx.fill();
+
+  // ── Person 1 — Girl (left, slightly smaller, head resting on Person 2's shoulder) ──
+  ctx.fillStyle   = `rgba(215,185,235,${AL})`;
+  ctx.strokeStyle = `rgba(215,185,235,${AL})`;
+
+  ctx.save();
+  ctx.translate(sx(70), sy(70));
+  // Body: M 0 60 C -15 20, 5 15, 15 15 C 25 15, 30 40, 25 60 Z
+  ctx.beginPath();
+  ctx.moveTo(0,           60*sc);
+  ctx.bezierCurveTo(-15*sc, 20*sc,  5*sc, 15*sc, 15*sc, 15*sc);
+  ctx.bezierCurveTo( 25*sc, 15*sc, 30*sc, 40*sc, 25*sc, 60*sc);
+  ctx.closePath(); ctx.fill();
+  // Head: cx=22 cy=5 r=14
+  ctx.beginPath(); ctx.arc(22*sc, 5*sc, 14*sc, 0, Math.PI*2); ctx.fill();
+  ctx.restore();
+
+  // ── Person 2 — Guy (right, taller, arm wrapping around) ──
+  ctx.fillStyle   = `rgba(180,155,215,${AL})`;
+  ctx.strokeStyle = `rgba(180,155,215,${AL})`;
+
+  ctx.save();
+  ctx.translate(sx(100), sy(55));
+  // Body: M -10 75 C -15 20, 10 10, 20 10 C 35 10, 45 40, 35 75 Z
+  ctx.beginPath();
+  ctx.moveTo(-10*sc,  75*sc);
+  ctx.bezierCurveTo(-15*sc, 20*sc, 10*sc, 10*sc, 20*sc, 10*sc);
+  ctx.bezierCurveTo( 35*sc, 10*sc, 45*sc, 40*sc, 35*sc, 75*sc);
+  ctx.closePath(); ctx.fill();
+  // Head: cx=15 cy=-8 r=16
+  ctx.beginPath(); ctx.arc(15*sc, -8*sc, 16*sc, 0, Math.PI*2); ctx.fill();
+  // Wrapping arm: M 5 20 C -10 30, -25 45, -35 55
+  ctx.lineWidth = 8 * sc;
+  ctx.beginPath();
+  ctx.moveTo(5*sc, 20*sc);
+  ctx.bezierCurveTo(-10*sc, 30*sc, -25*sc, 45*sc, -35*sc, 55*sc);
+  ctx.stroke();
+  ctx.restore();
+
+  // ── Scattered petals near the couple ──
+  const pScale = sc * 12; // petal size
+  const PETALS = [
+    {x:sx(52),  y:sy(48),  ang:0.35,  a:'235,165,188'},
+    {x:sx(40),  y:sy(38),  ang:-0.6,  a:'250,195,215'},
+    {x:sx(60),  y:sy(28),  ang:1.1,   a:'235,165,188'},
+    {x:sx(35),  y:sy(55),  ang:-1.2,  a:'220,150,178'},
+    {x:sx(72),  y:sy(35),  ang:0.8,   a:'250,195,215'},
+    {x:sx(45),  y:sy(20),  ang:-0.3,  a:'235,165,188'},
+    {x:sx(80),  y:sy(50),  ang:1.5,   a:'250,195,215'},
+  ];
+  for (const p of PETALS) {
+    ctx.save();
+    ctx.translate(p.x, p.y); ctx.rotate(p.ang);
+    ctx.fillStyle = `rgba(${p.a},${AL * 0.8})`;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, pScale * 0.36, pScale, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  ctx.restore();
+}
+
+// ── Particles ──
+const particles = [];
+
+class Particle {
+  constructor(mode) { this.mode = mode; this.reset(true); }
+
+  reset(init=false) {
+    const W = bgCanvas.width, H = bgCanvas.height;
+    switch(this.mode) {
+      case 'rain':
+        this.x = Math.random()*W*1.3; this.y = init ? Math.random()*H : -20;
+        this.vx=-1.4; this.vy=Math.random()*5+4; this.len=Math.random()*18+8;
+        this.a=Math.random()*0.22+0.07; this.c='184,196,212'; break;
+      case 'leaves':
+        this.x=Math.random()*W; this.y=init?Math.random()*H:H+20;
+        this.vx=(Math.random()-0.5)*0.6; this.vy=-(Math.random()*1.1+0.3);
+        this.sz=Math.random()*5+3; this.rot=Math.random()*Math.PI*2;
+        this.rotV=(Math.random()-0.5)*0.04; this.a=Math.random()*0.3+0.08;
+        this.sw=Math.random()*Math.PI*2; this.swS=Math.random()*0.02+0.01;
+        this.c=Math.random()>0.5?'109,138,101':'168,181,162'; break;
+      case 'petals':
+        this.x=Math.random()*W; this.y=init?Math.random()*H:-20;
+        this.vx=(Math.random()-0.5)*1.2; this.vy=Math.random()*1.4+0.7;
+        this.sz=Math.random()*10+6; this.rot=Math.random()*Math.PI*2;
+        this.rotV=(Math.random()-0.5)*0.05; this.a=Math.random()*0.32+0.1;
+        this.sw=Math.random()*Math.PI*2; this.swS=Math.random()*0.022+0.01;
+        this.c=Math.random()>0.45?'212,165,165':'196,149,140'; break;
+      case 'seeds':
+        this.x=Math.random()*W; this.y=init?Math.random()*H:H*1.1;
+        this.vx=(Math.random()-0.3)*1.4; this.vy=-(Math.random()*2+0.5);
+        this.sz=Math.random()*2+1; this.tail=Math.random()*10+5;
+        this.a=Math.random()*0.38+0.12;
+        this.sw=Math.random()*Math.PI*2; this.swS=Math.random()*0.03+0.015; break;
+      case 'hearts':
+        this.x=Math.random()*W; this.y=init?Math.random()*H:H+30;
+        this.vy=-(Math.random()*1.1+0.5); this.sz=Math.random()*18+9;
+        this.a=Math.random()*0.38+0.14; this.sw=Math.random()*Math.PI*2;
+        this.swS=Math.random()*0.018+0.008;
+        this.c=Math.random()>0.5?'230,140,170':'215,160,200'; break;
+      case 'stars':
+        this.x=Math.random()*W; this.y=init?Math.random()*H:Math.random()*H;
+        this.sz=Math.random()*1.8+0.4; this.a=Math.random()*0.65+0.1;
+        this.aV=(Math.random()-0.5)*0.014; this.vx=(Math.random()-0.5)*0.06;
+        this.vy=(Math.random()-0.5)*0.04; this.glow=Math.random()>0.82; break;
+    }
+  }
+
+  update() {
+    const W=bgCanvas.width, H=bgCanvas.height;
+    switch(this.mode) {
+      case 'rain':
+        this.x+=this.vx; this.y+=this.vy;
+        if(this.y>H+30||this.x<-60) this.reset(); break;
+      case 'leaves':
+        this.sw+=this.swS; this.x+=this.vx+Math.sin(this.sw)*0.5;
+        this.y+=this.vy; this.rot+=this.rotV;
+        if(this.y<-30) this.reset(); break;
+      case 'petals':
+        this.sw+=this.swS; this.x+=this.vx+Math.sin(this.sw)*1.1;
+        this.y+=this.vy; this.rot+=this.rotV;
+        if(this.y>H+30) this.reset(); break;
+      case 'seeds':
+        this.sw+=this.swS; this.x+=this.vx+Math.sin(this.sw)*0.8;
+        this.y+=this.vy;
+        if(this.y<-50||this.x<-50||this.x>W+50) this.reset(); break;
+      case 'hearts':
+        this.sw+=this.swS; this.x+=Math.sin(this.sw)*0.6;
+        this.y+=this.vy;
+        if(this.y<-40) this.reset(); break;
+      case 'stars':
+        this.a+=this.aV;
+        if(this.a>0.88){this.aV=-Math.abs(this.aV);}
+        if(this.a<0.05){this.aV=Math.abs(this.aV);}
+        this.x+=this.vx; this.y+=this.vy;
+        const W2=bgCanvas.width,H2=bgCanvas.height;
+        if(this.x<0)this.x=W2; if(this.x>W2)this.x=0;
+        if(this.y<0)this.y=H2; if(this.y>H2)this.y=0;
+        break;
+    }
+  }
+
+  draw(ctx) {
+    ctx.save();
+    switch(this.mode) {
+      case 'rain':
+        ctx.globalAlpha=this.a;
+        ctx.strokeStyle=`rgb(${this.c})`; ctx.lineWidth=0.6;
+        ctx.beginPath(); ctx.moveTo(this.x,this.y);
+        ctx.lineTo(this.x-this.vx*(this.len/this.vy),this.y-this.len); ctx.stroke(); break;
+      case 'leaves':
+        ctx.globalAlpha=this.a; ctx.translate(this.x,this.y); ctx.rotate(this.rot);
+        ctx.fillStyle=`rgba(${this.c},0.55)`; ctx.strokeStyle=`rgba(${this.c},0.8)`; ctx.lineWidth=0.5;
+        ctx.beginPath(); ctx.ellipse(0,0,this.sz*0.55,this.sz,0,0,Math.PI*2);
+        ctx.fill(); ctx.stroke(); break;
+      case 'petals': {
+        // Draw as a 5-petal flower
+        ctx.globalAlpha=this.a; ctx.translate(this.x,this.y); ctx.rotate(this.rot);
+        const fs=this.sz;
+        for(let k=0;k<5;k++){
+          ctx.rotate(Math.PI*2/5);
+          ctx.beginPath();
+          ctx.ellipse(0,-fs*0.52,fs*0.2,fs*0.46,0,0,Math.PI*2);
+          ctx.fillStyle=`rgba(${this.c},0.5)`; ctx.fill();
+        }
+        // Center dot
+        ctx.beginPath(); ctx.arc(0,0,fs*0.18,0,Math.PI*2);
+        ctx.fillStyle=`rgba(201,149,108,${this.a*0.9})`; ctx.fill();
+        break;
+      }
+      case 'seeds':
+        ctx.globalAlpha=this.a;
+        ctx.fillStyle='rgba(240,230,210,0.9)';
+        ctx.beginPath(); ctx.arc(this.x,this.y,this.sz*0.45,0,Math.PI*2); ctx.fill();
+        ctx.strokeStyle='rgba(240,230,210,0.35)'; ctx.lineWidth=0.35;
+        for(let i=0;i<5;i++){
+          const a=(i/5)*Math.PI*2-Math.PI/2;
+          ctx.beginPath(); ctx.moveTo(this.x,this.y);
+          ctx.lineTo(this.x+Math.cos(a)*this.tail,this.y+Math.sin(a)*this.tail); ctx.stroke();
+        } break;
+      case 'hearts': {
+        ctx.globalAlpha=this.a; ctx.translate(this.x,this.y);
+        const s=this.sz;
+        ctx.fillStyle=`rgba(${this.c},0.8)`;
+        ctx.beginPath();
+        // Proper 4-curve heart: bottom tip → left lobe → top cleft → right lobe → bottom
+        ctx.moveTo(0, s*0.35);
+        ctx.bezierCurveTo(-s*0.05, s*0.15, -s*0.65, -s*0.05, -s*0.5, -s*0.35);
+        ctx.bezierCurveTo(-s*0.4,  -s*0.65, 0, -s*0.55, 0, -s*0.3);
+        ctx.bezierCurveTo(0, -s*0.55, s*0.4,  -s*0.65, s*0.5, -s*0.35);
+        ctx.bezierCurveTo(s*0.65, -s*0.05, s*0.05, s*0.15, 0, s*0.35);
+        ctx.closePath(); ctx.fill(); break;
+      }
+      case 'stars':
+        if(this.glow){
+          const g=ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.sz*5);
+          g.addColorStop(0,`rgba(196,184,212,${this.a*0.7})`);
+          g.addColorStop(1,'rgba(196,184,212,0)');
+          ctx.fillStyle=g; ctx.beginPath(); ctx.arc(this.x,this.y,this.sz*5,0,Math.PI*2); ctx.fill();
+        }
+        ctx.globalAlpha=this.a; ctx.fillStyle='rgb(220,212,232)';
+        ctx.beginPath(); ctx.arc(this.x,this.y,this.sz,0,Math.PI*2); ctx.fill(); break;
+    }
+    ctx.restore();
+  }
+}
+
+const PARTICLE_COUNTS = {rain:130,leaves:55,petals:65,seeds:75,hearts:55,stars:0};
+
+function initParticles(mode) {
+  particles.length = 0;
+  // Love theme gets hearts + stars
+  const modes = mode==='hearts' ? ['hearts','stars'] : [mode];
+  const cnts  = mode==='hearts' ? [55,100] : [PARTICLE_COUNTS[mode]||0];
+  modes.forEach((m,i) => {
+    for(let j=0;j<cnts[i];j++) particles.push(new Particle(m));
+  });
+}
+
+// ── Main render loop ──
+function renderBg() {
+  requestAnimationFrame(renderBg);
+  const W=bgCanvas.width, H=bgCanvas.height;
+
+  if(bgT<1) bgT=Math.min(1,bgT+0.006);
+  const c1=lerpArr(bgC1,tgtC1,bgT), c2=lerpArr(bgC2,tgtC2,bgT);
+  if(bgT>=1){ bgC1=[...tgtC1]; bgC2=[...tgtC2]; }
+
+  const grad = bgCtx.createLinearGradient(0,0,W,H);
+  grad.addColorStop(0,`rgb(${c1})`);
+  grad.addColorStop(1,`rgb(${c2})`);
+  bgCtx.fillStyle=grad;
+  bgCtx.fillRect(0,0,W,H);
+
+  if(S.themeIdx===1 && S.screen==='reader') drawPlants(bgCtx);
+  if(S.themeIdx===3 && S.screen==='reader') drawWanderingLandscape(bgCtx);
+  if(S.themeIdx===4 && (S.screen==='reader'||S.screen==='letter')) {
+    // Soft warm glow where the couple sits
+    const gx=W*0.78, gy=H*0.72, gr=Math.min(W,H)*0.52;
+    const lovGlow=bgCtx.createRadialGradient(gx,gy,0,gx,gy,gr);
+    lovGlow.addColorStop(0,'rgba(160,72,112,0.14)');
+    lovGlow.addColorStop(0.5,'rgba(120,50,90,0.07)');
+    lovGlow.addColorStop(1,'rgba(120,50,90,0)');
+    bgCtx.fillStyle=lovGlow; bgCtx.fillRect(0,0,W,H);
+    drawSilhouettes(bgCtx);
+  }
+
+  for(const p of particles){ p.update(); p.draw(bgCtx); }
+}
+renderBg();
+
+// ════════════════════════════════════════════════════
+// MUSIC (Tone.js Sampler — real piano samples)
+// ════════════════════════════════════════════════════
+// ── Piano sampler ──
+let piano = null, masterVol = null;
+let musicActive = false, musicTimer = null, musicNoteIdx = 0;
+
+const SAMPLE_BASE = 'https://tonejs.github.io/audio/salamander/';
+const SAMPLE_MAP = {
+  A0:'A0.mp3', C1:'C1.mp3', 'D#1':'Ds1.mp3', 'F#1':'Fs1.mp3',
+  A1:'A1.mp3', C2:'C2.mp3', 'D#2':'Ds2.mp3', 'F#2':'Fs2.mp3',
+  A2:'A2.mp3', C3:'C3.mp3', 'D#3':'Ds3.mp3', 'F#3':'Fs3.mp3',
+  A3:'A3.mp3', C4:'C4.mp3', 'D#4':'Ds4.mp3', 'F#4':'Fs4.mp3',
+  A4:'A4.mp3', C5:'C5.mp3', 'D#5':'Ds5.mp3', 'F#5':'Fs5.mp3',
+  A5:'A5.mp3', C6:'C6.mp3', 'D#6':'Ds6.mp3', 'F#6':'Fs6.mp3',
+  A6:'A6.mp3', C7:'C7.mp3', 'D#7':'Ds7.mp3', 'F#7':'Fs7.mp3',
+  A7:'A7.mp3', C8:'C8.mp3'
+};
+
+const loadingEl = document.getElementById('music-loading');
+
+async function initPiano() {
+  await Tone.start();
+  if (piano) return;
+
+  masterVol = new Tone.Volume(-9).toDestination();
+  const reverb = new Tone.Reverb({ decay: 5.5, wet: 0.55 }).connect(masterVol);
+  const delay  = new Tone.FeedbackDelay({ delayTime: '8n', feedback: 0.18, wet: 0.12 }).connect(reverb);
+
+  piano = new Tone.Sampler({
+    urls: SAMPLE_MAP,
+    baseUrl: SAMPLE_BASE,
+    release: 1.4,
+    onload: () => {
+      S.musicReady = true;
+      loadingEl.style.opacity = '0';
+      if (S.screen === 'reader') playThemeMusic(S.themeIdx);
+    }
+  }).connect(delay);
+}
+
+// setTimeout-based scheduling — no Transport, works reliably across all themes
+function playThemeMusic(themeIdx) {
+  if (!S.soundOn || !piano || !S.musicReady) return;
+
+  // Stop any existing playback
+  musicActive = false;
+  if (musicTimer) { clearTimeout(musicTimer); musicTimer = null; }
+  musicNoteIdx = 0;
+
+  // Always restore volume (stopMusic ramps it to -60 when going back to themes)
+  if (masterVol) masterVol.volume.rampTo(-9, 0.6);
+
+  const melody = THEMES[themeIdx].melody;
+  const tempo  = THEMES[themeIdx].tempo;
+  // Tone.Time needs BPM context for relative values ('4n' etc.)
+  Tone.Transport.bpm.value = tempo;
+
+  musicActive = true;
+
+  function playNext() {
+    if (!musicActive || !S.soundOn) return;
+    const [note, dur] = melody[musicNoteIdx % melody.length];
+    try {
+      piano.triggerAttackRelease(note, dur, Tone.now(), 0.36 + Math.random() * 0.14);
+    } catch (e) {}
+    musicNoteIdx++;
+    // Schedule next note: full duration × 0.86 gives slight overlap / legato feel
+    const ms = Tone.Time(dur).toSeconds() * 1000 * 0.86;
+    musicTimer = setTimeout(playNext, ms);
+  }
+
+  playNext();
+}
+
+function stopMusic() {
+  musicActive = false;
+  if (musicTimer) { clearTimeout(musicTimer); musicTimer = null; }
+  if (masterVol) masterVol.volume.rampTo(-60, 0.8);
+}
+
+function resumeMusic() {
+  if (masterVol) masterVol.volume.rampTo(-9, 0.6);
+  if (S.screen === 'reader') playThemeMusic(S.themeIdx);
+}
+
+// ════════════════════════════════════════════════════
+// TRANSITIONS (creative, theme-specific)
+// ════════════════════════════════════════════════════
+
+// ── Lightning (falling apart) ──
+function drawLightningBolt(ctx, x1,y1,x2,y2, disp, segs) {
+  if(segs<=1){ ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); return; }
+  const mx=(x1+x2)/2, my=(y1+y2)/2;
+  const dx=y2-y1, dy=-(x2-x1);
+  const len=Math.sqrt(dx*dx+dy*dy)||1;
+  const off=(Math.random()-0.5)*disp;
+  const nx=mx+dx/len*off, ny=my+dy/len*off;
+  drawLightningBolt(ctx,x1,y1,nx,ny,disp/2,segs/2);
+  drawLightningBolt(ctx,nx,ny,x2,y2,disp/2,segs/2);
+}
+
+function lightningTransition(cb) {
+  const W=fxCanvas.width, H=fxCanvas.height;
+  const startTime = performance.now();
+  const DURATION = 950;
+  let called=false;
+
+  function tick(now) {
+    const t=(now-startTime)/DURATION;
+    fxCtx.clearRect(0,0,W,H);
+
+    if(!called) {
+      if(t<0.25) {
+        const intensity=t/0.25;
+        fxCtx.fillStyle=`rgba(200,220,255,${intensity*0.15})`;
+        fxCtx.fillRect(0,0,W,H);
+        fxCtx.beginPath();
+        fxCtx.strokeStyle=`rgba(200,220,255,${0.7+intensity*0.3})`;
+        fxCtx.lineWidth=2.5;
+        drawLightningBolt(fxCtx,W*0.35+Math.random()*W*0.3,0,W*0.2+Math.random()*W*0.6,H,90,8);
+        fxCtx.stroke();
+        fxCtx.beginPath(); fxCtx.lineWidth=1.2; fxCtx.strokeStyle='rgba(180,210,255,0.55)';
+        drawLightningBolt(fxCtx,W*0.55,H*0.25,W*0.72,H*0.65,40,4); fxCtx.stroke();
+        gsap.set('#poem-inner',{opacity:1-intensity*0.6});
+      } else if(t<0.55) {
+        const ash=(t-0.25)/0.3;
+        fxCtx.fillStyle=`rgba(12,18,28,${ash*0.94})`;
+        fxCtx.fillRect(0,0,W,H);
+        for(let i=0;i<70;i++){
+          const px=Math.random()*W, py=Math.random()*H*ash+H*(1-ash)*0.4;
+          fxCtx.fillStyle=`rgba(140,155,175,${Math.random()*0.4})`;
+          fxCtx.fillRect(px,py,Math.random()*4+0.5,Math.random()*2.5+0.5);
+        }
+        gsap.set('#poem-inner',{opacity:0});
+      }
+      if(t>=0.5){ called=true; gsap.set('#poem-inner',{opacity:0,x:0}); cb(); }
+    } else {
+      // After cb: fade fxCanvas dark cover out only
+      const out=Math.max(0,(t-0.5)/0.5);
+      fxCtx.fillStyle=`rgba(12,18,28,${(1-out)*0.94})`;
+      fxCtx.fillRect(0,0,W,H);
+    }
+
+    if(t<1) requestAnimationFrame(tick);
+    else { fxCtx.clearRect(0,0,W,H); gsap.to('#fx-canvas',{opacity:0,duration:0.2}); }
+  }
+  gsap.to('#fx-canvas',{opacity:1,duration:0.08});
+  requestAnimationFrame(tick);
+}
+
+// ── Branch sweep (growing) ──
+function branchTransition(cb) {
+  const W=fxCanvas.width, H=fxCanvas.height;
+  const startTime=performance.now();
+  const DURATION=1000;
+  let called=false;
+
+  function tick(now) {
+    const t=(now-startTime)/DURATION;
+    fxCtx.clearRect(0,0,W,H);
+
+    const progress=Math.min(1,t*1.8);
+    const bx2=W*progress-W*0.05, by2=H*0.2+H*0.55*progress;
+
+    // Draw branch sweeping across
+    fxCtx.beginPath();
+    fxCtx.moveTo(-60,H*0.08);
+    fxCtx.bezierCurveTo(W*0.25,H*0.12,W*0.55,H*0.22,bx2,by2);
+    fxCtx.strokeStyle='rgba(80,120,75,0.85)';
+    fxCtx.lineWidth=14+Math.sin(t*12)*2;
+    fxCtx.lineCap='round'; fxCtx.stroke();
+
+    // Smaller branch
+    if(progress>0.2){
+      fxCtx.beginPath();
+      fxCtx.moveTo(W*0.25,H*0.15);
+      fxCtx.quadraticCurveTo(W*0.35,H*0.05,W*0.45*progress,H*0.08);
+      fxCtx.strokeStyle='rgba(80,120,75,0.5)'; fxCtx.lineWidth=5; fxCtx.stroke();
+    }
+
+    // Leaves scattering from tip
+    if(progress>0.25){
+      for(let i=0;i<10;i++){
+        const lx=bx2+(Math.random()-0.5)*80, ly=by2+(Math.random()-0.5)*80;
+        fxCtx.save(); fxCtx.translate(lx,ly); fxCtx.rotate(Math.random()*Math.PI*2);
+        fxCtx.fillStyle=`rgba(100,150,90,${Math.random()*0.45})`;
+        fxCtx.beginPath(); fxCtx.ellipse(0,0,7,14,0,0,Math.PI*2); fxCtx.fill();
+        fxCtx.restore();
+      }
+    }
+
+    if(!called) gsap.set('#poem-inner',{x:progress*40,opacity:Math.max(0,1-progress*2)});
+    if(t>=0.42 && !called){ called=true; gsap.set('#poem-inner',{opacity:0,x:0}); cb(); }
+
+    // Dark cover fades in after callback
+    if(called && t<1){
+      const cover=Math.min(1,(t-0.42)/0.35);
+      fxCtx.fillStyle=`rgba(13,26,15,${cover*0.88})`; fxCtx.fillRect(0,0,W,H);
+    }
+
+    if(t<1) requestAnimationFrame(tick);
+    else { fxCtx.clearRect(0,0,W,H); gsap.to('#fx-canvas',{opacity:0,duration:0.4}); }
+  }
+
+  gsap.to('#fx-canvas',{opacity:1,duration:0.08});
+  requestAnimationFrame(tick);
+}
+
+// ── Petal storm (gentle things) ──
+function petalTransition(cb) {
+  const W=fxCanvas.width, H=fxCanvas.height;
+  const burstFlowers=[];
+  for(let i=0;i<70;i++){
+    const a=Math.random()*Math.PI*2;
+    const spd=Math.random()*7+2.5;
+    burstFlowers.push({
+      x:W/2+(Math.random()-0.5)*100, y:H/2+(Math.random()-0.5)*100,
+      vx:Math.cos(a)*spd, vy:Math.sin(a)*spd-1.5,
+      rot:Math.random()*Math.PI*2, rotV:(Math.random()-0.5)*0.18,
+      sz:Math.random()*14+6, al:0.85+Math.random()*0.15,
+      c:Math.random()>0.45?'212,165,165':'201,130,140'
+    });
+  }
+  const startTime=performance.now(); const DUR=1100; let called=false;
+
+  function drawBurstFlower(p,alpha){
+    fxCtx.save(); fxCtx.translate(p.x,p.y); fxCtx.rotate(p.rot);
+    const s=p.sz;
+    for(let k=0;k<5;k++){
+      fxCtx.rotate(Math.PI*2/5);
+      fxCtx.beginPath(); fxCtx.ellipse(0,-s*0.55,s*0.22,s*0.5,0,0,Math.PI*2);
+      fxCtx.fillStyle=`rgba(${p.c},${alpha*0.75})`; fxCtx.fill();
+    }
+    fxCtx.beginPath(); fxCtx.arc(0,0,s*0.22,0,Math.PI*2);
+    fxCtx.fillStyle=`rgba(201,149,108,${alpha*0.9})`; fxCtx.fill();
+    fxCtx.restore();
+  }
+
+  function tick(now){
+    const t=(now-startTime)/DUR;
+    fxCtx.clearRect(0,0,W,H);
+    const alpha=Math.max(0,1-t*1.1);
+    for(const p of burstFlowers){
+      p.x+=p.vx; p.y+=p.vy; p.vy+=0.14; p.rot+=p.rotV;
+      drawBurstFlower(p, p.al*alpha);
+    }
+    if(!called) gsap.set('#poem-inner',{opacity:Math.max(0,1-t*3)});
+    if(t>=0.32 && !called){ called=true; gsap.set('#poem-inner',{opacity:0,x:0}); cb(); }
+    if(t<1) requestAnimationFrame(tick);
+    else { fxCtx.clearRect(0,0,W,H); gsap.to('#fx-canvas',{opacity:0,duration:0.3}); }
+  }
+  gsap.to('#fx-canvas',{opacity:1,duration:0.08});
+  requestAnimationFrame(tick);
+}
+
+// ── Wind scatter (wandering) ──
+function windTransition(dir, cb) {
+  const W=fxCanvas.width, H=fxCanvas.height;
+  const windDir=dir==='next'?-1:1;
+  const startTime=performance.now(); const DUR=850; let called=false;
+
+  const seeds=[];
+  for(let i=0;i<80;i++){
+    seeds.push({
+      x:W*0.05+Math.random()*W*0.9, y:H*0.1+Math.random()*H*0.8,
+      vx:windDir*(Math.random()*5+3), vy:(Math.random()-0.5)*1.5,
+      sz:Math.random()*2.2+0.8, al:0.55+Math.random()*0.35,
+      tail:Math.random()*12+6
+    });
+  }
+
+  function tick(now){
+    const t=(now-startTime)/DUR;
+    fxCtx.clearRect(0,0,W,H);
+    const alpha=Math.max(0,1-t*1.2);
+    for(const s of seeds){
+      s.x+=s.vx; s.y+=s.vy;
+      fxCtx.globalAlpha=s.al*alpha;
+      fxCtx.fillStyle='rgba(240,225,185,0.9)';
+      fxCtx.beginPath(); fxCtx.arc(s.x,s.y,s.sz*0.45,0,Math.PI*2); fxCtx.fill();
+      fxCtx.strokeStyle='rgba(240,225,185,0.35)'; fxCtx.lineWidth=0.4;
+      for(let k=0;k<4;k++){
+        const a=(k/4)*Math.PI*2-Math.PI/2;
+        fxCtx.beginPath(); fxCtx.moveTo(s.x,s.y);
+        fxCtx.lineTo(s.x+Math.cos(a)*s.tail,s.y+Math.sin(a)*s.tail); fxCtx.stroke();
+      }
+    }
+    fxCtx.globalAlpha=1;
+
+    if(!called){
+      gsap.set('#poem-inner',{x:windDir*(-1)*t*50, opacity:Math.max(0,1-t*2.5)});
+      if(t>=0.38){ called=true; gsap.set('#poem-inner',{opacity:0,x:0}); cb(); }
+    }
+
+    if(t<1) requestAnimationFrame(tick);
+    else { fxCtx.clearRect(0,0,W,H); gsap.to('#fx-canvas',{opacity:0,duration:0.3}); }
+  }
+  gsap.to('#fx-canvas',{opacity:1,duration:0.08});
+  requestAnimationFrame(tick);
+}
+
+// ── Love heart burst ──
+function heartTransition(cb) {
+  const W=fxCanvas.width, H=fxCanvas.height;
+  // Origin: where the couple sits (right side of canvas, like silhouettes)
+  const originX = W*0.78;
+  const originY = H*0.55;
+  const hearts=[];
+  const COLORS=['230,148,178','215,170,205','245,190,215','200,135,165'];
+  for(let i=0;i<65;i++){
+    const ang = Math.random()*Math.PI*2; // full radial burst
+    const spd = Math.random()*5+1.8;
+    hearts.push({
+      x: originX+(Math.random()-0.5)*80,
+      y: originY+(Math.random()-0.5)*80,
+      vx: Math.cos(ang)*spd,
+      vy: Math.sin(ang)*spd - 2.0, // upward bias
+      sz: Math.random()*22+8,
+      rot: Math.random()*Math.PI*2,
+      rotV: (Math.random()-0.5)*0.06,
+      al: 0.8+Math.random()*0.2,
+      c: COLORS[Math.floor(Math.random()*COLORS.length)]
+    });
+  }
+  const startTime=performance.now(); const DUR=1200; let called=false;
+
+  function drawHeart(x,y,s,alpha,rot,c){
+    fxCtx.save(); fxCtx.translate(x,y); fxCtx.rotate(rot); fxCtx.globalAlpha=alpha;
+    fxCtx.fillStyle=`rgba(${c},0.85)`;
+    fxCtx.beginPath();
+    // Same 4-curve heart as the particles
+    fxCtx.moveTo(0, s*0.35);
+    fxCtx.bezierCurveTo(-s*0.05, s*0.15, -s*0.65, -s*0.05, -s*0.5, -s*0.35);
+    fxCtx.bezierCurveTo(-s*0.4, -s*0.65, 0, -s*0.55, 0, -s*0.3);
+    fxCtx.bezierCurveTo(0, -s*0.55, s*0.4, -s*0.65, s*0.5, -s*0.35);
+    fxCtx.bezierCurveTo(s*0.65, -s*0.05, s*0.05, s*0.15, 0, s*0.35);
+    fxCtx.closePath(); fxCtx.fill();
+    fxCtx.restore();
+  }
+
+  function tick(now){
+    const t=(now-startTime)/DUR;
+    fxCtx.clearRect(0,0,W,H);
+
+    // Warm rose veil — subtle bloom, not blinding
+    const veil = t<0.18 ? t/0.18 : t<0.65 ? 1 : 1-(t-0.65)/0.35;
+    fxCtx.fillStyle=`rgba(170,85,110,${veil*0.18})`;
+    fxCtx.fillRect(0,0,W,H);
+
+    const alpha=Math.max(0,1-t*1.0);
+    for(const h of hearts){
+      h.x+=h.vx; h.y+=h.vy;
+      h.vy+=0.013; // gentle gravity — hearts drift, not fall
+      h.vx+=Math.sin(now*0.003+h.rot)*0.04; // gentle sway
+      h.rot+=h.rotV;
+      drawHeart(h.x,h.y,h.sz,h.al*alpha,h.rot,h.c);
+    }
+
+    if(!called) gsap.set('#poem-inner',{opacity:Math.max(0,1-t*3)});
+    if(t>=0.35 && !called){ called=true; gsap.set('#poem-inner',{opacity:0,x:0}); cb(); }
+
+    if(t<1) requestAnimationFrame(tick);
+    else { fxCtx.clearRect(0,0,W,H); gsap.to('#fx-canvas',{opacity:0,duration:0.5}); }
+  }
+  gsap.to('#fx-canvas',{opacity:1,duration:0.1});
+  requestAnimationFrame(tick);
+}
+
+function runTransition(themeId, direction, cb) {
+  switch(themeId){
+    case 'falling_apart': lightningTransition(cb); break;
+    case 'growing':       branchTransition(cb); break;
+    case 'gentle_things': petalTransition(cb); break;
+    case 'wandering':     windTransition(direction, cb); break;
+    case 'love':          heartTransition(cb); break;
+    default: cb();
+  }
+}
+
+// ════════════════════════════════════════════════════
+// INTRO
+// ════════════════════════════════════════════════════
+const introEl    = document.getElementById('screen-intro');
+const flowerEl   = document.getElementById('intro-flower');
+const fpaths     = document.querySelectorAll('.flower-path');
+
+function animateIntro() {
+  gsap.timeline()
+    .to(flowerEl, {opacity:1, duration:0.5})
+    .to(fpaths, {strokeDashoffset:0, duration:2.4, stagger:0.14, ease:'power2.inOut'}, '-=0.2')
+    .to('#intro-for',  {opacity:1, y:0, duration:1.1, ease:'power2.out'}, '-=0.5')
+    .to('#intro-sub',  {opacity:1, duration:1, ease:'power2.out'}, '-=0.4')
+    .to('#intro-tap',  {opacity:1, duration:0.8, onComplete:()=>document.getElementById('intro-tap').classList.add('visible')}, '+=1.1');
+}
+window.addEventListener('load', () => setTimeout(animateIntro, 300));
+
+// ════════════════════════════════════════════════════
+// SCREEN FLOW
+// ════════════════════════════════════════════════════
+function goToThemes() {
+  if(S.transitioning) return;
+  S.transitioning = true;
+
+  // Start loading piano immediately
+  initPiano().catch(()=>{});
+  loadingEl.style.opacity = '1';
+
+  gsap.to(introEl, {
+    opacity:0, duration:0.75, ease:'power2.inOut',
+    onComplete:() => {
+      introEl.style.display='none';
+      introEl.classList.remove('active');
+      showThemes();
+      S.transitioning=false;
+    }
+  });
+}
+
+function showThemes() {
+  const el = document.getElementById('screen-themes');
+  el.classList.add('active'); S.screen='themes';
+  tgtC1=[13,11,8]; tgtC2=[18,13,10]; bgT=0;
+  initParticles('petals');
+
+  gsap.to(el,{opacity:1,duration:0.5});
+  gsap.to('#themes-header',{opacity:1,y:0,duration:0.7,delay:0.3,ease:'power2.out'});
+  gsap.to('.theme-card',{opacity:1,y:0,scale:1,duration:0.65,stagger:0.1,delay:0.45,ease:'power2.out'});
+  gsap.to('#sound-toggle',{opacity:1,duration:0.5,delay:0.7});
+}
+
+function goToReader(idx) {
+  if(S.transitioning) return;
+  S.transitioning=true;
+  S.themeIdx=idx; S.poemIdx=0;
+
+  const theme=THEMES[idx];
+  const themesEl=document.getElementById('screen-themes');
+  const readerEl=document.getElementById('screen-reader');
+
+  gsap.to(themesEl,{
+    opacity:0, duration:0.55,
+    onComplete:() => {
+      themesEl.classList.remove('active');
+
+      setThemeBg(theme);
+      initParticles(theme.particleMode);
+      if(idx===1) initPlants();
+      document.documentElement.style.setProperty('--theme-accent', theme.accent);
+
+      playThemeMusic(idx);
+
+      readerEl.classList.add('active'); S.screen='reader';
+      gsap.set(readerEl,{opacity:0});
+      gsap.to(readerEl,{opacity:1,duration:0.7,ease:'power2.out'});
+
+      buildDots();
+      showPoem(0,'none');
+      showReaderUI();
+      S.transitioning=false;
+    }
+  });
+}
+
+function goBackToThemes() {
+  if(S.transitioning) return;
+  S.transitioning=true;
+
+  stopMusic();
+  hideReaderUI();
+
+  gsap.to('#screen-reader',{
+    opacity:0, duration:0.6,
+    onComplete:() => {
+      document.getElementById('screen-reader').classList.remove('active');
+      tgtC1=[13,11,8]; tgtC2=[18,13,10]; bgT=0;
+      initParticles('petals');
+      document.getElementById('site-footer').style.opacity='0';
+
+      const el=document.getElementById('screen-themes');
+      el.classList.add('active'); S.screen='themes';
+      gsap.to(el,{opacity:1,duration:0.5});
+      S.transitioning=false;
+    }
+  });
+}
+
+// ════════════════════════════════════════════════════
+// POEM READER
+// ════════════════════════════════════════════════════
+function buildDots() {
+  const theme=THEMES[S.themeIdx];
+  const el=document.getElementById('progress-dots');
+  el.innerHTML='';
+  theme.poems.forEach((_,i) => {
+    const d=document.createElement('div');
+    d.className='dot'+(i===0?' active':'');
+    d.addEventListener('click',()=>navigateTo(i));
+    el.appendChild(d);
+  });
+}
+
+function updateDots(i) {
+  document.querySelectorAll('.dot').forEach((d,j)=>d.classList.toggle('active',j===i));
+}
+
+function showReaderUI() {
+  gsap.to(['.reader-back','.progress-dots','.nav-arrow'],{opacity:1,duration:0.6,delay:0.5});
+}
+function hideReaderUI() {
+  gsap.to(['.reader-back','.progress-dots','.nav-arrow'],{opacity:0,duration:0.3});
+}
+
+function showPoem(idx, dir) {
+  const theme=THEMES[S.themeIdx];
+  const poem=theme.poems[idx];
+  const inner=document.getElementById('poem-inner');
+  const label=document.getElementById('poem-theme-label');
+  const title=document.getElementById('poem-title');
+  const body =document.getElementById('poem-body');
+  const content=document.getElementById('reader-content');
+
+  content.scrollTop=0;
+  label.textContent=theme.title;
+  title.textContent=poem.title;
+  body.textContent =poem.body;
+
+  // Reset positions — always force inner visible first
+  const inX = dir==='next'?55 : dir==='prev'?-55 : 0;
+  const delay = dir==='none' ? 0 : 0.22; // brief pause so dark cover lifts first
+  gsap.set([title,body],{opacity:0,x:inX,y:0});
+  gsap.set(inner,{opacity:1,x:0,y:0});
+  // Label is fixed top-right — just fade it in (no slide)
+  gsap.set(label,{opacity:0});
+
+  gsap.timeline({ delay })
+    .to(label,{opacity:1,duration:0.55,ease:'power2.out'})
+    .to(title,{opacity:1,x:0,duration:0.65,ease:'power2.out'},'-=0.35')
+    .to(body, {opacity:1,x:0,duration:0.75,ease:'power2.out'},'-=0.45');
+
+  updateDots(idx);
+  S.poemIdx=idx;
+
+  // Hide next arrow on last poem of any theme, EXCEPT love (has secret letter)
+  const isLastPoem = idx === theme.poems.length - 1;
+  const nextBtn = document.getElementById('nav-next');
+  nextBtn.style.opacity = (isLastPoem && S.themeIdx !== 4) ? '0' : '';
+  nextBtn.style.pointerEvents = (isLastPoem && S.themeIdx !== 4) ? 'none' : '';
+
+  // Footer on last love poem
+  const isLast=S.themeIdx===4 && idx===THEMES[4].poems.length-1;
+  document.getElementById('site-footer').style.opacity=isLast?'1':'0';
+}
+
+function navigateTo(idx) {
+  const theme=THEMES[S.themeIdx];
+  if(idx<0||idx>=theme.poems.length||S.transitioning) return;
+  S.transitioning=true;
+
+  const dir=idx>S.poemIdx?'next':'prev';
+  const themeId=theme.id;
+
+  runTransition(themeId, dir, () => {
+    showPoem(idx, dir);
+    setTimeout(()=>{ S.transitioning=false; },400);
+  });
+}
+
+function nextPoem() { navigateTo(S.poemIdx+1); }
+function prevPoem() { navigateTo(S.poemIdx-1); }
+
+// ════════════════════════════════════════════════════
+// EVENTS
+// ════════════════════════════════════════════════════
+document.getElementById('screen-intro').addEventListener('click',()=>{
+  if(S.screen==='intro') goToThemes();
+});
+
+document.querySelectorAll('.theme-card').forEach((card,i)=>{
+  card.addEventListener('click',()=>{ if(S.screen==='themes') goToReader(i); });
+  card.addEventListener('keydown',e=>{ if(e.key==='Enter'&&S.screen==='themes') goToReader(i); });
+});
+
+document.getElementById('reader-back').addEventListener('click', goBackToThemes);
+document.getElementById('nav-prev').addEventListener('click', prevPoem);
+document.getElementById('nav-next').addEventListener('click', nextPoem);
+
+document.addEventListener('keydown',e=>{
+  if(S.screen==='reader'){
+    if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' '){ e.preventDefault(); nextPoem(); }
+    else if(e.key==='ArrowLeft'||e.key==='ArrowUp'){ e.preventDefault(); prevPoem(); }
+    else if(e.key==='Escape') goBackToThemes();
+  }
+});
+
+let tx=0,ty=0;
+document.addEventListener('touchstart',e=>{ tx=e.touches[0].clientX; ty=e.touches[0].clientY; },{passive:true});
+document.addEventListener('touchend',e=>{
+  if(S.screen!=='reader') return;
+  const dx=e.changedTouches[0].clientX-tx, dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>40){ if(dx<0) nextPoem(); else prevPoem(); }
+},{passive:true});
+
+// Sound toggle
+const soundBtn=document.getElementById('sound-toggle');
+soundBtn.addEventListener('click', async ()=>{
+  S.soundOn=!S.soundOn;
+  document.getElementById('icon-on').style.display=S.soundOn?'':'none';
+  document.getElementById('icon-off').style.display=S.soundOn?'none':'';
+  if(S.soundOn){ await initPiano(); resumeMusic(); if(masterVol) masterVol.volume.rampTo(-10,0.5); }
+  else { if(masterVol) masterVol.volume.rampTo(-60,0.8); }
+});
+
+// Inject active dot accent color
+const accentStyle=document.createElement('style');
+accentStyle.textContent='.dot.active{background:var(--theme-accent,rgba(250,240,232,0.85))!important;}';
+document.head.appendChild(accentStyle);
+
+// ════════════════════════════════════════════════════
+// SECRET LETTER
+// ════════════════════════════════════════════════════
+let stampClicks = 0;
+const letterScreen   = document.getElementById('screen-letter');
+const letterPaperWrap= document.getElementById('letter-paper-wrap');
+const heartStamp     = document.getElementById('heart-stamp');
+const stampHint      = document.getElementById('stamp-hint');
+const stampCracks    = document.getElementById('stamp-cracks');
+const letterBack     = document.getElementById('letter-back');
+
+function openLetterScreen() {
+  S.screen = 'letter';
+  stampClicks = 0;
+  heartStamp.classList.remove('glow1','glow2');
+  gsap.set(stampCracks,{opacity:0});
+  stampHint.style.opacity='1';
+  gsap.set(letterPaperWrap,{opacity:0});
+  letterPaperWrap.classList.remove('visible');
+  const envWrapReset = document.getElementById('letter-envelope-wrap');
+  envWrapReset.style.position = '';
+  envWrapReset.style.zIndex = '';
+  gsap.set(envWrapReset,{opacity:1,y:0});
+
+  letterScreen.classList.add('active');
+  gsap.to(letterScreen,{opacity:1,duration:0.8,ease:'power2.inOut'});
+  gsap.to('#letter-back',{opacity:1,duration:0.6,delay:0.6});
+
+  // Keep the love-theme particles running in background
+}
+
+function closeLetterScreen() {
+  gsap.to(letterScreen,{opacity:0,duration:0.5,onComplete:()=>{
+    letterScreen.classList.remove('active');
+    S.screen='reader';
+  }});
+  gsap.to('#letter-back',{opacity:0,duration:0.3});
+}
+
+heartStamp.addEventListener('click', () => {
+  if(S.screen !== 'letter') return;
+  stampClicks++;
+
+  if(stampClicks === 1) {
+    heartStamp.classList.add('glow1');
+    gsap.fromTo(heartStamp,{scale:1},{scale:1.13,duration:0.12,yoyo:true,repeat:1,ease:'power2.out'});
+    stampHint.textContent = 'twice more…';
+  } else if(stampClicks === 2) {
+    heartStamp.classList.remove('glow1');
+    heartStamp.classList.add('glow2');
+    gsap.to(stampCracks,{opacity:1,duration:0.25});
+    gsap.fromTo(heartStamp,{scale:1},{scale:1.16,duration:0.1,yoyo:true,repeat:1,ease:'power2.out'});
+    stampHint.textContent = 'one more…';
+  } else if(stampClicks >= 3) {
+    // Open the letter — letter rises out of the envelope
+    stampHint.style.opacity='0';
+
+    // 1. Stamp shatters
+    gsap.to(heartStamp,{scale:1.4,opacity:0,duration:0.3,ease:'power2.in'});
+
+    // 2. Immediately make letter paper visible but starting deep behind the envelope
+    //    Envelope sits on top (z-index) while letter rises from within it
+    const envWrap = document.getElementById('letter-envelope-wrap');
+    envWrap.style.position = 'relative';
+    envWrap.style.zIndex = '10';
+    letterPaperWrap.classList.add('visible');
+    gsap.set(letterPaperWrap,{opacity:1});
+    gsap.set('#letter-paper',{y:160, opacity:1});
+
+    // 3. Letter rises upward, emerging from the envelope
+    gsap.to('#letter-paper',{y:0, duration:1.1, ease:'power2.out', delay:0.15});
+
+    // 4. Envelope fades away once the letter is halfway out
+    gsap.to(envWrap,{opacity:0, duration:0.5, delay:0.55, ease:'power2.in',
+      onComplete:()=>{ envWrap.style.zIndex=''; envWrap.style.position=''; }
+    });
+  }
+});
+
+letterBack.addEventListener('click', () => {
+  if(S.screen==='letter') closeLetterScreen();
+});
+
+// Override navigateTo — last love poem "next" opens the secret letter
+// (Function declarations hoist, so this definition wins over the one above.)
+function navigateTo(idx) {
+  const theme = THEMES[S.themeIdx];
+  if(S.themeIdx===4 && idx>=theme.poems.length && !S.transitioning) {
+    S.transitioning = true;
+    runTransition('love','next',()=>{
+      S.transitioning = false;
+      openLetterScreen();
+    });
+    return;
+  }
+  if(idx<0||idx>=theme.poems.length||S.transitioning) return;
+  S.transitioning=true;
+  const dir=idx>S.poemIdx?'next':'prev';
+  runTransition(theme.id, dir, () => {
+    showPoem(idx, dir);
+    setTimeout(()=>{ S.transitioning=false; },400);
+  });
+}
+
+// ESC closes letter screen (capture phase so it runs before reader handler)
+document.addEventListener('keydown', e => {
+  if(S.screen==='letter' && e.key==='Escape'){ e.stopImmediatePropagation(); closeLetterScreen(); }
+}, true);
+</script>
+</body>
+</html>
